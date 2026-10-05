@@ -1,0 +1,47 @@
+# ==============================================================================
+# 🚀 GOOGLE CLOUD BUILD PIPELINE (CI/CD)
+# AfricaWinners Scientific Blog & Tech Hub (AWSJ)
+# ==============================================================================
+
+steps:
+  # 1. Construir imagem Docker usando cache
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/africawinner-hub:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/africawinner-hub:latest'
+      - '.'
+
+  # 2. Publicar imagens no Google Container Registry / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/africawinner-hub:$COMMIT_SHA']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/africawinner-hub:latest']
+
+  # 3. Deploy automático no Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'africawinner-hub'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/africawinner-hub:$COMMIT_SHA'
+      - '--region'
+      - 'europe-west1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,PORT=8080,JOURNAL_FOUNDER=Valdimir Jacinto Esteves,JOURNAL_PHONE=976161521,JOURNAL_EMAIL=escritorioestevesemultisservic@gmail.com'
+
+images:
+  - 'gcr.io/$PROJECT_ID/africawinner-hub:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/africawinner-hub:latest'
+
+timeout: '900s'
+options:
+  logging: CLOUD_LOGGING_ONLY

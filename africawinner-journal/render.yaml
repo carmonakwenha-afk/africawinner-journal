@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: africawinner-journal
+    env: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JOURNAL_FOUNDER
+        value: "Valdimir Jacinto Esteves"
+      - key: JOURNAL_EMAIL
+        value: "escritorioestevesemultisservic@gmail.com"
+      - key: JOURNAL_PHONE
+        value: "976161521"

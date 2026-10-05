@@ -1,0 +1,18 @@
+# .gcloudignore - Ficheiros ignorados no upload para o Google Cloud
+.gcloudignore
+.git/
+.gitignore
+node_modules/
+npm-debug.log
+.env
+.env.*
+!.env.example
+*.ps1
+*.bat
+.firebaserc
+firebase.json
+render.yaml
+*.md
+!README.md
+!DEPLOY_GOOGLE_CLOUD.md
+PROPOSTA_PARCERIA_UNIVERSIDADES.doc

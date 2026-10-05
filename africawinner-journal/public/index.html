@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AfricaWinners Blog & Tech Hub (AWSJ) - Inovação, Histórias & Mentoria em África</title>
+  <meta name="description" content="Blog e Tech Hub de inovação científica da AfricaWinners (AWSJ). Partilha aberta de artigos, robótica e histórias comunitárias com mentoria de Valdimir Jacinto Esteves rumo a uma revista de alto calibre.">
+  <meta name="keywords" content="AfricaWinners, Scientific Blog, Tech Hub Africa, Inovação, Robótica, Inteligência Artificial, Valdimir Jacinto Esteves">
+  <meta name="author" content="Valdimir Jacinto Esteves">
+
+  <!-- Scholarly Metadata for Google Scholar & Academic Indexers -->
+  <meta name="citation_journal_title" content="AfricaWinners Scientific Blog & Tech Hub">
+  <meta name="citation_journal_abbrev" content="AWSJ">
+  <meta name="citation_issn" content="2959-1082">
+  <meta name="citation_publisher" content="AfricaWinners / Escritório Esteves & Multi-Serviços">
+  <meta name="citation_language" content="pt">
+
+  <!-- Google Fonts: Archivo Black & Montserrat (Empowered Voices Model) + Cinzel, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Identity Services (OAuth 2.0) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Estilos do Portal -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       BARRA INSTITUCIONAL SUPERIOR (TRILINGUE: PT, EN, FR)
+       ======================================================================== -->
+  <aside class="top-bar" aria-label="Informações Institucionais">
+    <div class="container">
+      <div class="top-bar-badges">
+        <span class="top-bar-badge"><i class="fas fa-certificate"></i> <span data-i18n="issnOnline">ISSN 2959-1082 (Online)</span></span>
+        <span class="top-bar-badge"><i class="fas fa-rocket" style="color:var(--brand-blue-hover);"></i> <span data-i18n="crossrefDoiMember">Rumo a Revista Científica Internacional</span></span>
+      </div>
+      <div class="top-bar-right">
+        <span><i class="fas fa-user-tie" style="color:var(--gold-primary); margin-right:4px;"></i> <span data-i18n="founderLabel">Fundador & Mentor:</span> <strong>Valdimir Jacinto Esteves</strong></span>
+        <a href="mailto:escritorioestevesemultisservic@gmail.com"><i class="fas fa-envelope"></i> escritorioestevesemultisservic@gmail.com</a>
+        <a href="tel:976161521"><i class="fas fa-phone-alt"></i> 976161521</a>
+        <button class="btn btn-outline-pill btn-sm" onclick="openAdminDashboard()" style="padding:0.25rem 0.75rem; font-size:0.78rem; border-color:var(--gold-primary); color:var(--gold-light); cursor:pointer;">
+          <i class="fas fa-shield-alt"></i> <span data-i18n="navAdmin">Painel Admin</span>
+        </button>
+        
+        <!-- Alternador Trilingue de Idioma -->
+        <div class="lang-selector">
+          <button class="lang-btn active" data-lang="pt">PT 🇵🇹</button>
+          <button class="lang-btn" data-lang="en">EN 🇬🇧</button>
+          <button class="lang-btn" data-lang="fr">FR 🇫🇷</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================================================
+       CABEÇALHO & NAVEGAÇÃO PRINCIPAL (ESTILO EMPOWERED VOICES)
+       ======================================================================== -->
+  <header class="header">
+    <div class="container">
+      <a href="#inicio" class="logo-container">
+        <div class="logo-crest">
+          <i class="fas fa-award"></i>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">AfricaWinners</span>
+          <span class="logo-subtitle">Scientific Blog & Tech Hub</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#inicio" class="nav-link active" data-i18n="navHome">Início</a></li>
+          <li><a href="#pilares" class="nav-link" data-i18n="navPillars">Pilares & Vozes</a></li>
+          <li><a href="#parceiros" class="nav-link" data-i18n="navPartners">Parceiros</a></li>
+          <li><a href="#artigos" class="nav-link" data-i18n="navArticles">Blog & Artigos</a></li>
+          <li><a href="#biblioteca" class="nav-link" data-i18n="navLibrary">A Biblioteca</a></li>
+          <li><a href="#" class="nav-link" data-modal-open="aiAssistantModal" style="color:#c4b5fd;"><i class="fas fa-brain"></i> <span data-i18n="navAI">Assistente IA</span></a></li>
+          <li><a href="#de-vida" class="nav-link" data-i18n="navBringToLife">Dê Vida</a></li>
+          <li><a href="#media-kit" class="nav-link" data-i18n="navMediaKit">Mídia Kit & Eventos</a></li>
+          <li><a href="#submissao" class="nav-link" data-i18n="navSubmit">Submeter Artigo</a></li>
+          <li><a href="#mentoria" class="nav-link" data-i18n="navFounder">Mentor Valdimir</a></li>
+          <li><a href="#" class="nav-link admin-nav-link" onclick="openAdminDashboard(); return false;" style="color:var(--gold-primary); font-weight:700;"><i class="fas fa-user-shield"></i> <span data-i18n="navAdmin">Painel Admin</span></a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <div id="userNavActions" style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="btn btn-outline-pill btn-sm" data-modal-open="loginModal">
+            <i class="fas fa-sign-in-alt"></i> <span data-i18n="btnSignIn">Entrar</span>
+          </button>
+          <a href="#submissao" class="btn btn-brand-pill btn-sm">
+            <i class="fas fa-paper-plane"></i> <span data-i18n="navSubmit">Submeter Artigo</span>
+          </a>
+        </div>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       SECÇÃO HERO (ESTILO EMPOWERED VOICES: HISTÓRIAS, CIÊNCIA & MENTORIA)
+       ======================================================================== -->
+  <section class="hero" id="inicio">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-kicker">
+            <span class="hero-kicker-dot"></span>
+            <span data-i18n="heroKicker">Iniciativa de Mentoria & Divulgação Científica em África</span>
+          </div>
+
+          <h1 class="hero-title">
+            <span data-i18n="heroTitleMain">CADA COMUNIDADE TEM HISTÓRIAS & CIÊNCIA QUE MERECEM SER ETERNIZADAS.</span>
+            <span class="hero-title-gold" data-i18n="heroTitleGold">AfricaWinners Scientific Blog & Tech Hub</span>
+          </h1>
+
+          <p class="hero-description" data-i18n="heroDesc">
+            Unimos mentoria científica sob a liderança do Fundador Valdimir Jacinto Esteves, tecnologia e divulgação comunitária para capacitar a nova geração de investigadores. Partilhe a sua actividade, projeto, artigo ou inovação com Certificado Oficial.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#artigos" class="btn btn-brand-pill btn-lg">
+              <i class="fas fa-play"></i> <span data-i18n="btnHeroExplore">Explorar Histórias & Artigos</span>
+            </a>
+            <a href="#submissao" class="btn btn-outline-pill btn-lg">
+              <i class="fas fa-paper-plane"></i> <span data-i18n="btnSubmitHero">Submeter Artigo</span>
+            </a>
+            <button class="btn btn-ai btn-pill btn-lg" data-modal-open="aiAssistantModal">
+              <i class="fas fa-brain"></i> <span data-i18n="btnAIHero">Assistente IA de Redação</span>
+            </button>
+          </div>
+
+          <div class="hero-features-ribbon">
+            <div class="hero-feature-item">
+              <i class="fas fa-user-graduate hero-feature-icon"></i>
+              <div class="hero-feature-text">
+                <strong data-i18n="featRigorous">Mentoria Rigorosa</strong>
+                <span data-i18n="featRigorousSub">Valdimir Jacinto Esteves</span>
+              </div>
+            </div>
+            <div class="hero-feature-item">
+              <i class="fas fa-microchip hero-feature-icon" style="color:var(--brand-blue-hover);"></i>
+              <div class="hero-feature-text">
+                <strong data-i18n="featDoi">Tech Hub Comunitário</strong>
+                <span data-i18n="featDoiSub">Robótica, STEM & IA</span>
+              </div>
+            </div>
+            <div class="hero-feature-item">
+              <i class="fas fa-certificate hero-feature-icon" style="color:var(--gold-primary);"></i>
+              <div class="hero-feature-text">
+                <strong data-i18n="featCert">Certificado Oficial</strong>
+                <span data-i18n="featCertSub">Com Reconhecimento Oficial</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-media-wrapper">
+          <div class="hero-media-frame">
+            <img src="assets/hero-science.jpg" alt="Estudantes Africanos na Robótica e Ciência" id="heroImage">
+            <div class="hero-media-badge">
+              <div>
+                <div class="hero-badge-title" data-i18n="heroMediaTitle">Projeto Comunitário de Inovação & Robótica</div>
+                <div class="hero-badge-desc" data-i18n="heroMediaDesc">Capacitação Tecnológica das Novas Gerações em Angola</div>
+              </div>
+              <a href="#artigos" class="btn btn-brand-pill btn-sm" style="padding:0.45rem 1.1rem !important; font-size:0.76rem;">
+                <i class="fas fa-eye"></i> <span data-i18n="btnWatchStory">Ver Destaque</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       BARRA DE MÉTRICAS & ESTATÍSTICAS
+       ======================================================================== -->
+  <section class="stats-bar" aria-label="Estatísticas">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="statPublished">3</div>
+          <div class="stat-label" data-i18n="statPub">Artigos Publicados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statSubmissions">12</div>
+          <div class="stat-label" data-i18n="statEval">Manuscritos em Mentoria</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statDownloads">1,037</div>
+          <div class="stat-label" data-i18n="statDown">Downloads de PDFs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statViews">3,230</div>
+          <div class="stat-label" data-i18n="statReads">Leituras Globais</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: PILARES DA COMUNIDADE & CIÊNCIA (ESTILO EMPOWERED VOICES)
+       ======================================================================== -->
+  <section class="pillars-section" id="pilares">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secPillarsKicker">Vozes da Comunidade & Inovação</span>
+        <h2 class="section-title" data-i18n="secPillarsTitle">Comunidade & Impacto Científico</h2>
+        <p class="section-subtitle" data-i18n="secPillarsSub">
+          Preservando saberes, impulsionando líderes e divulgando a ciência e tecnologia feitas em África.
+        </p>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon-box">
+            <i class="fas fa-landmark"></i>
+          </div>
+          <h3 class="pillar-title" data-i18n="pillar1Title">Vozes Históricas & Científicas</h3>
+          <p class="pillar-desc" data-i18n="pillar1Desc">
+            Preserve memórias orais, descobertas pioneiras, saberes acadêmicos e patrimônio científico das comunidades antes que se percam.
+          </p>
+          <a href="#artigos" class="pillar-link"><span data-i18n="linkExplore">Explorar Histórias</span> <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box" style="background:rgba(16,185,129,0.14); border-color:rgba(16,185,129,0.4); color:#34d399;">
+            <i class="fas fa-hands-helping"></i>
+          </div>
+          <h3 class="pillar-title" data-i18n="pillar2Title">Vozes de Impacto Comunitário</h3>
+          <p class="pillar-desc" data-i18n="pillar2Desc">
+            Destaque pesquisadores, professores e líderes que transformam as suas regiões através da educação STEM, energias renováveis e saúde pública.
+          </p>
+          <a href="#submissao" class="pillar-link" style="color:#34d399;"><span data-i18n="linkParticipate">Submeter Artigo</span> <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon-box" style="background:rgba(212,175,55,0.14); border-color:rgba(212,175,55,0.4); color:var(--gold-primary);">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h3 class="pillar-title" data-i18n="pillar3Title">Vozes da Nova Geração & Tech Hub</h3>
+          <p class="pillar-desc" data-i18n="pillar3Desc">
+            Dê visibilidade a jovens inventores, makers, startups de robótica e inteligência artificial que constroem soluções práticas para o continente.
+          </p>
+          <a href="#submissao" class="pillar-link" style="color:var(--gold-light);"><span data-i18n="linkPublishTech">Publicar Inovação</span> <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: NOSSOS PARCEIROS & REDE CIENTÍFICA (OUR PARTNERS)
+       ======================================================================== -->
+  <section class="partners-section" id="parceiros">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secPartnersKicker">Rede de Colaboração Internacional</span>
+        <h2 class="section-title" data-i18n="secPartnersTitle">Nossos Parceiros & Ecossistema</h2>
+        <p class="section-subtitle" data-i18n="secPartnersSub">
+          Trabalhamos com instituições e redes que acreditam no poder transformador da ciência e das vozes africanas.
+        </p>
+      </div>
+
+      <div class="partners-grid" id="partnersGrid">
+        <div class="partner-item" id="partner-card-3">
+          <i class="fas fa-book-reader" style="color:#34d399;"></i>
+          <strong>Sociedades Científicas Africanas</strong>
+          <span>Pesquisa & Patrimônio Acadêmico</span>
+        </div>
+        <div class="partner-item" id="partner-card-4">
+          <i class="fas fa-microchip" style="color:#38bdf8;"></i>
+          <strong>Polos Tecnológicos & Startups STEM</strong>
+          <span>Makers, Hardware & Inovação</span>
+        </div>
+        <div class="partner-item" id="partner-card-5">
+          <i class="fas fa-city" style="color:#fbbf24;"></i>
+          <strong>Municípios & Províncias Inovadoras</strong>
+          <span>Impacto Comunitário & Extensão</span>
+        </div>
+        <div class="partner-item" id="partner-card-6">
+          <i class="fas fa-award" style="color:var(--gold-primary);"></i>
+          <strong>Escritório Esteves & Multi-Serviços</strong>
+          <span>Coordenação Editorial & Mentoria</span>
+          <a href="mailto:escritorioestevesemultisservic@gmail.com" style="font-size:0.75rem; color:var(--gold-light); margin-top:0.35rem; display:inline-block;"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: POSTS E ARTIGOS DO BLOG (STORIES BEYOND BORDERS)
+       ======================================================================== -->
+  <section class="section" id="artigos">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secArticlesKicker">Histórias Sem Fronteiras & Produção Científica</span>
+        <h2 class="section-title" data-i18n="secArticlesTitle">Artigos do Blog & Investigações</h2>
+        <p class="section-subtitle" data-i18n="secArticlesSub">
+          Durante anos, a AfricaWinners tem percorrido o continente recolhendo investigações de coragem, inovação, resiliência e transformação.
+        </p>
+      </div>
+
+      <div class="articles-controls">
+        <!-- Filtros por Formato de Publicação (Diferença entre Artigos, Histórias, Actividades e Projectos) -->
+        <div class="pub-type-filters" id="pubTypeFilters">
+          <button class="pub-type-filter-chip active" data-pubtype="all">
+            <i class="fas fa-layer-group"></i> <span>Todos os Formatos</span>
+          </button>
+          <button class="pub-type-filter-chip" data-pubtype="Artigo Científico">
+            <i class="fas fa-file-alt"></i> <span>📄 Artigos Científicos</span>
+          </button>
+          <button class="pub-type-filter-chip" data-pubtype="História de Vencedor">
+            <i class="fas fa-trophy"></i> <span>🏆 Histórias de Vencedor</span>
+          </button>
+          <button class="pub-type-filter-chip" data-pubtype="Actividade">
+            <i class="fas fa-bullhorn"></i> <span>🎯 Actividades</span>
+          </button>
+          <button class="pub-type-filter-chip" data-pubtype="Projecto">
+            <i class="fas fa-robot"></i> <span>🤖 Projectos Tech</span>
+          </button>
+        </div>
+
+        <div class="field-filters">
+          <button class="filter-chip active" data-field="all" data-i18n="filterAll">Todas as Áreas</button>
+          <button class="filter-chip" data-field="Ciência da Computação & IA" data-i18n="filterCS">Computação & IA</button>
+          <button class="filter-chip" data-field="Energias Renováveis & Engenharia" data-i18n="filterEnergy">Energias Renováveis</button>
+          <button class="filter-chip" data-field="Biotecnologia & Agrociências" data-i18n="filterBio">Biotecnologia & Agro</button>
+          <button class="filter-chip" data-field="Ciências da Saúde" data-i18n="filterHealth">Ciências da Saúde</button>
+        </div>
+
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="articleSearchInput" placeholder="Pesquisar por título, autor ou palavra-chave..." data-i18n-placeholder="searchPlaceholder" aria-label="Pesquisar">
+        </div>
+      </div>
+
+      <div class="articles-grid" id="articlesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: A BIBLIOTECA AFRICAWINNERS (THE LIBRARY)
+       ======================================================================== -->
+  <section class="library-section" id="biblioteca">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secLibraryKicker">Recursos Acadêmicos & Modelos</span>
+        <h2 class="section-title" data-i18n="secLibraryTitle">A Biblioteca AfricaWinners</h2>
+        <p class="section-subtitle" data-i18n="secLibrarySub">
+          Os artigos e histórias que partilhamos integram uma missão maior de capacitar autores a usar as suas vozes com autenticidade, coragem e rigor.
+        </p>
+      </div>
+
+      <div class="library-grid">
+        <div class="library-card">
+          <i class="fas fa-file-word library-icon" style="color:var(--brand-blue-hover);"></i>
+          <h4 data-i18n="libCard1Title">Modelo Oficial de Artigo (.DOC)</h4>
+          <p data-i18n="libCard1Desc">Baixe o modelo formatado com cabeçalho internacional, estrutura IMRyD e normas para submissão imediata.</p>
+          <a href="/api/template/download?format=doc" class="btn btn-brand-pill btn-sm">
+            <i class="fas fa-download"></i> <span data-i18n="btnDownloadDoc">Baixar (.DOC)</span>
+          </a>
+        </div>
+
+        <div class="library-card">
+          <i class="fas fa-certificate library-icon" style="color:#34d399;"></i>
+          <h4 data-i18n="libCard2Title">Diretrizes & Submissão de Artigos</h4>
+          <p data-i18n="libCard2Desc">Orientações sobre a mentoria técnica, partilha aberta no Blog & Tech Hub e critérios para o Certificado Oficial.</p>
+          <a href="#diretrizes" class="btn btn-outline-pill btn-sm">
+            <i class="fas fa-book-open"></i> <span data-i18n="btnReadGuide">Diretrizes</span>
+          </a>
+        </div>
+
+        <div class="library-card">
+          <i class="fas fa-road library-icon" style="color:var(--brand-blue-hover);"></i>
+          <h4 data-i18n="libCard3Title">Rumo à Revista Internacional</h4>
+          <p data-i18n="libCard3Desc">Conheça o nosso roteiro de evolução gradual do Blog & Tech Hub rumo a uma revista científica indexada de alto calibre.</p>
+          <a href="#diretrizes" class="btn btn-outline-pill btn-sm">
+            <i class="fas fa-info-circle"></i> <span>Ver Roteiro</span>
+          </a>
+        </div>
+
+        <div class="library-card">
+          <i class="fas fa-brain library-icon" style="color:#c4b5fd;"></i>
+          <h4 data-i18n="libCard4Title">Assistente IA de Redação</h4>
+          <p data-i18n="libCard4Desc">Use inteligência artificial avançada para estruturar o seu resumo, extrair palavras-chave e traduzir o manuscrito.</p>
+          <button class="btn btn-ai btn-sm btn-pill" data-modal-open="aiAssistantModal">
+            <i class="fas fa-magic"></i> <span data-i18n="btnOpenAI">Abrir IA</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: DÊ VIDA A ESTAS VOZES (BRING THESE STORIES TO LIFE - 3 CARDS)
+       ======================================================================== -->
+  <section class="bring-to-life-section" id="de-vida">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secActionKicker">Como Participar & Apoiar</span>
+        <h2 class="section-title" data-i18n="secActionTitle">Dê Vida a Estas Vozes & Investigações</h2>
+        <p class="section-subtitle" data-i18n="secActionSub">
+          A AfricaWinners apoia-se em parceiros, mentores, investigadores e organizações que acreditam que cada voz científica tem valor.
+        </p>
+      </div>
+
+      <div class="bring-to-life-grid">
+        <div class="action-card">
+          <h3 data-i18n="actCard1Title">Seja um Parceiro da AfricaWinners</h3>
+          <p data-i18n="actCard1Desc">
+            Representa uma universidade, escola, entidade financiadora ou plataforma interessada em colaboração? Procuramos parceiros que acreditam no poder transformador do conhecimento real. Vamos conversar.
+          </p>
+          <a href="#contacto" class="btn btn-outline-pill">
+            <i class="fas fa-handshake"></i> <span data-i18n="btnPartnerContact">Falar com a Equipa</span>
+          </a>
+        </div>
+
+        <div class="action-card">
+          <h3 data-i18n="actCard2Title">Junte-se à Rede de Mentoria</h3>
+          <p data-i18n="actCard2Desc">
+            Esta iniciativa integra um movimento coordenado pelo Mentor Valdimir Jacinto Esteves para ajudar jovens investigadores a superar barreiras e publicar com excelência e autenticidade.
+          </p>
+          <a href="#mentoria" class="btn btn-outline-pill">
+            <i class="fas fa-user-graduate"></i> <span data-i18n="btnMeetMentor">Conhecer o Mentor</span>
+          </a>
+        </div>
+
+        <div class="action-card featured">
+          <span class="action-badge">ACESSO ABERTO • CERTIFICADO</span>
+          <h3 data-i18n="actCard3Title">Publique a Sua Investigação, Projeto Tech ou História de Vencedor</h3>
+          <p data-i18n="actCard3Desc">
+            Partilhe as suas pesquisas, descobertas, protótipos de robótica ou a sua inspiradora história de vencedor com o continente. Submissão aberta com mentoria dedicada e Certificado Oficial chancelado pelo mentor.
+          </p>
+          <a href="#submissao" class="btn btn-brand-pill">
+            <i class="fas fa-paper-plane"></i> <span data-i18n="btnSubmitCard">Submeter Artigo ou História</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: MÍDIA KIT & COBERTURA DE EVENTOS (PARCERIAS INSTITUCIONAIS & TECH)
+       ======================================================================== -->
+  <section class="section section-alt media-kit-section" id="media-kit">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secMediaKitKicker">Parcerias Institucionais & Cobertura</span>
+        <h2 class="section-title" data-i18n="secMediaKitTitle">Mídia Kit & Cobertura de Eventos Científicos & Tech</h2>
+        <p class="section-subtitle" data-i18n="secMediaKitSub">
+          Posicione a sua universidade, ministério ou empresa de tecnologia através da cobertura editorial oficial do AfricaWinners Blog & Tech Hub. Propostas comerciais personalizadas sob medida.
+        </p>
+      </div>
+
+      <div class="media-kit-grid">
+        <!-- Card 1 -->
+        <div class="media-kit-card">
+          <div class="media-kit-card-header">
+            <span class="media-kit-badge" data-i18n="mkPack1Badge">DIVULGAÇÃO & REPORTAGEM</span>
+            <div class="media-kit-icon"><i class="fas fa-newspaper"></i></div>
+          </div>
+          <h3 data-i18n="mkPack1Title">Pacote Cobertura Essencial</h3>
+          <p data-i18n="mkPack1Desc">
+            Artigo pré-evento de ampla divulgação no blog, cobertura editorial e fotográfica durante a atividade, e publicação destacada das conclusões e momentos-chave no portal.
+          </p>
+          <ul class="media-kit-benefits">
+            <li><i class="fas fa-check-circle"></i> Artigo de pré-lançamento no Blog</li>
+            <li><i class="fas fa-check-circle"></i> Cobertura editorial e fotográfica</li>
+            <li><i class="fas fa-check-circle"></i> Galeria dos momentos e palestrantes</li>
+          </ul>
+        </div>
+
+        <!-- Card 2 (Featured) -->
+        <div class="media-kit-card featured">
+          <div class="media-kit-card-header">
+            <span class="media-kit-badge highlight" data-i18n="mkPack2Badge">MAIS PROCURADO • MULTIMÍDIA</span>
+            <div class="media-kit-icon"><i class="fas fa-video"></i></div>
+          </div>
+          <h3 data-i18n="mkPack2Title">Pacote Cobertura Premium & Whitepaper</h3>
+          <p data-i18n="mkPack2Desc">
+            Tudo da cobertura essencial, acrescido de entrevistas exclusivas em vídeo/áudio com palestrantes e cientistas, elaboração de whitepaper técnico (relatório pós-evento) e chancela do Mentor Valdimir Jacinto Esteves.
+          </p>
+          <ul class="media-kit-benefits">
+            <li><i class="fas fa-check-circle"></i> Entrevistas exclusivas em vídeo e áudio</li>
+            <li><i class="fas fa-check-circle"></i> Whitepaper técnico com síntese científica</li>
+            <li><i class="fas fa-check-circle"></i> Chancela oficial do Mentor Valdimir</li>
+          </ul>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="media-kit-card">
+          <div class="media-kit-card-header">
+            <span class="media-kit-badge" data-i18n="mkPack3Badge">EMPRESAS & STARTUPS</span>
+            <div class="media-kit-icon"><i class="fas fa-laptop-code"></i></div>
+          </div>
+          <h3 data-i18n="mkPack3Title">Publieditoriais Tech & Inovação</h3>
+          <p data-i18n="mkPack3Desc">
+            Publicação de artigos técnicos especializados demonstrando soluções de software, engenharia de ponta, telecomunicações e inovação corporativa no Tech Hub da AfricaWinners.
+          </p>
+          <ul class="media-kit-benefits">
+            <li><i class="fas fa-check-circle"></i> Destaque no Tech Hub com selo de Inovação</li>
+            <li><i class="fas fa-check-circle"></i> Indexação editorial permanente</li>
+            <li><i class="fas fa-check-circle"></i> Alcance qualificado de pesquisadores e decisores</li>
+          </ul>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="media-kit-card">
+          <div class="media-kit-card-header">
+            <span class="media-kit-badge" data-i18n="mkPack4Badge">CONVÊNIO ANUAL</span>
+            <div class="media-kit-icon"><i class="fas fa-handshake"></i></div>
+          </div>
+          <h3 data-i18n="mkPack4Title">Parceria Institucional de Mídia</h3>
+          <p data-i18n="mkPack4Desc">
+            Acompanhamento contínuo de todas as jornadas científicas, semanas tecnológicas e feiras acadêmicas da sua instituição ao longo do ano, com ampla visibilidade digital e institucional.
+          </p>
+          <ul class="media-kit-benefits">
+            <li><i class="fas fa-check-circle"></i> Cobertura continuada de eventos anuais</li>
+            <li><i class="fas fa-check-circle"></i> Banner institucional no portal</li>
+            <li><i class="fas fa-check-circle"></i> Apoio à divulgação das faculdades</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Caixa de Acordo Institucional via E-mail (Sem números financeiros) -->
+      <div class="media-kit-cta-box">
+        <div class="media-kit-cta-content">
+          <div class="media-kit-cta-icon">
+            <i class="fas fa-envelope-open-text"></i>
+          </div>
+          <div>
+            <h4 data-i18n="mkNoticeTitle">Acordo Institucional & Proposta Sob Medida</h4>
+            <p data-i18n="mkNoticeDesc">
+              Cada evento e parceria possui objetivos únicos. Não exibimos tarifas padronizadas no portal: todos os termos e propostas sob medida são alinhados diretamente via correspondência oficial por e-mail com a coordenação institucional.
+            </p>
+            <div class="media-kit-mentor-ref">
+              <i class="fas fa-user-check" style="color:var(--brand-blue-hover);"></i>
+              <span>Atendimento institucional conduzido pelo <strong>Fundador & Mentor Valdimir Jacinto Esteves</strong> • Escritório Esteves & Multi-Serviços</span>
+            </div>
+          </div>
+        </div>
+        <div class="media-kit-cta-actions">
+          <a href="mailto:escritorioestevesemultisservic@gmail.com?subject=Solicitacao%20de%20Proposta%20-%20Cobertura%20de%20Evento%20AfricaWinners&body=Ola%20Mentor%20Valdimir%20Jacinto%20Esteves,%0D%0A%0D%0AGostariamos%20de%20solicitar%20uma%20proposta%20de%20cobertura%20de%20evento%20/%20parceria%20com%20o%20AfricaWinners%20Scientific%20Blog%20%26%20Tech%20Hub.%0D%0A%0D%0ANome%20da%20Instituicao%20/%20Empresa:%20%0D%0ATipo%20de%20Evento:%20%0D%0AData%20Prevista:%20%0D%0ALocalizacao:%20%0D%0AContacto:%20" class="btn btn-brand-pill btn-lg">
+            <i class="fas fa-envelope"></i> <span data-i18n="btnRequestProposal">Solicitar Proposta por E-mail</span>
+          </a>
+          <a href="tel:976161521" class="btn btn-outline-pill btn-lg">
+            <i class="fas fa-phone-alt"></i> <span data-i18n="btnCallMentor">Ligar (+244 976161521)</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: SUBMISSÃO DE MANUSCRITOS
+       ======================================================================== -->
+  <section class="section" id="submissao">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secSubmitKicker">Submissão para Publicação & Mentoria</span>
+        <h2 class="section-title" data-i18n="secSubmitTitle">Submeter Artigo, Projeto Tech ou História de Vencedor</h2>
+        <p class="section-subtitle" data-i18n="secSubmitSub">
+          Envie o seu artigo, actividade, relato de projeto ou história de superação e vitória para avaliação e mentoria técnica, com acompanhamento personalizado e emissão do Certificado Oficial.
+        </p>
+      </div>
+
+      <div class="submission-card">
+        <form id="submissionForm">
+          <div class="submission-grid">
+            <!-- Dados do Autor -->
+            <div class="form-group">
+              <label class="form-label" for="submitAuthorName"><span data-i18n="lblAuthorName">Nome Completo do Autor Principal</span> <span class="req">*</span></label>
+              <input type="text" id="submitAuthorName" name="author_name" class="form-control" placeholder="Ex: Dr. Manuel António" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="submitAuthorEmail"><span data-i18n="lblAuthorEmail">E-mail Institucional / Académico</span> <span class="req">*</span></label>
+              <input type="email" id="submitAuthorEmail" name="author_email" class="form-control" placeholder="exemplo@universidade.ao" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="submitInstitution"><span data-i18n="lblInstitution">Instituição de Ensino / Universidade</span> <span class="req">*</span></label>
+              <input type="text" id="submitInstitution" name="institution" class="form-control" placeholder="Ex: Instituto Superior de Tecnologias / Centro Maker" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="submitPhone"><span data-i18n="lblPhone">Contacto Telefónico / WhatsApp</span></label>
+              <input type="tel" id="submitPhone" name="phone" class="form-control" placeholder="Ex: 976161521">
+            </div>
+
+            <!-- Seletor Exclusivo de Formato de Publicação (Diferença Clara entre Artigos, Histórias, Actividades e Projectos) -->
+            <div class="form-group full-width">
+              <label class="form-label"><span data-i18n="lblPubFormat">Formato da Publicação</span> <span class="req">*</span></label>
+              <div class="pub-type-selector-grid" id="submissionPubTypeGrid">
+                <div class="pub-type-card active" data-type="Artigo Científico">
+                  <div class="pub-type-card-icon"><i class="fas fa-file-alt"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>Artigo Científico</strong>
+                    <span>Pesquisa formal e investigação acadêmica</span>
+                  </div>
+                  <div class="pub-type-rule-badge required-doc">
+                    <i class="fas fa-certificate"></i> Com Certificado Oficial • Exige Manuscrito
+                  </div>
+                </div>
+
+                <div class="pub-type-card" data-type="História de Vencedor">
+                  <div class="pub-type-card-icon"><i class="fas fa-trophy"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>História de Vencedor</strong>
+                    <span>Trajetória de superação pessoal ou comunitária</span>
+                  </div>
+                  <div class="pub-type-rule-badge optional-doc">
+                    <i class="fas fa-camera"></i> Fotos & Vídeos • Sem Certificação
+                  </div>
+                </div>
+
+                <div class="pub-type-card" data-type="Actividade">
+                  <div class="pub-type-card-icon"><i class="fas fa-bullhorn"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>Actividade</strong>
+                    <span>Eventos, oficinas, jornadas científicas ou acções</span>
+                  </div>
+                  <div class="pub-type-rule-badge optional-doc">
+                    <i class="fas fa-bullhorn"></i> Fotos & Vídeos • Sem Certificação
+                  </div>
+                </div>
+
+                <div class="pub-type-card" data-type="Projecto">
+                  <div class="pub-type-card-icon"><i class="fas fa-robot"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>Projecto Tech</strong>
+                    <span>Protótipos de robótica, makers, software & STEM</span>
+                  </div>
+                  <div class="pub-type-rule-badge optional-doc">
+                    <i class="fas fa-robot"></i> Fotos & Vídeos • Sem Certificação
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" id="submitPublicationType" name="publication_type" value="Artigo Científico">
+            </div>
+
+            <!-- Banner Informativo Dinâmico sobre Requisitos -->
+            <div class="form-group full-width">
+              <div class="pub-type-feedback-banner" id="pubTypeFeedbackBanner">
+                <div class="banner-icon"><i class="fas fa-info-circle"></i></div>
+                <div class="banner-text" id="pubTypeBannerText">
+                  <strong>Modo Artigo Científico:</strong> Exige o envio do manuscrito (.PDF ou .DOCX) e confere <strong>Certificado Oficial de Publicação</strong>. (Histórias, Actividades e Projectos não exigem documento e não possuem certificado).
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="submitOriginalJournal"><span data-i18n="lblOrigJournal">Revista ou Conferência de Origem</span> <small style="color:var(--text-muted);">(Se já publicado anteriormente)</small></label>
+              <input type="text" id="submitOriginalJournal" name="original_journal" class="form-control" placeholder="Ex: Elsevier, Springer, Revista Especializada, Conferência Internacional...">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="submitOriginalUrl"><span data-i18n="lblOrigUrl">Link / DOI da Publicação Original</span> <small style="color:var(--text-muted);">(Opcional)</small></label>
+              <input type="url" id="submitOriginalUrl" name="original_url" class="form-control" placeholder="https://doi.org/... ou link da publicação original">
+            </div>
+
+            <!-- Dados da Publicação (Título e Conteúdo/Resumo) -->
+            <div class="form-group full-width">
+              <label class="form-label" for="submitTitle"><span id="lblTitleText" data-i18n="lblArticleTitle">Título Completo do Artigo Científico</span> <span class="req">*</span></label>
+              <input type="text" id="submitTitle" name="title" class="form-control" placeholder="Ex: Modelos Preditivos de IA para Otimização Tecnológica em África" required>
+            </div>
+
+            <div class="form-group full-width">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <label class="form-label" for="submitAbstract" style="margin-bottom:0;"><span id="lblAbstractText" data-i18n="lblAbstract">Resumo Estruturado (Mínimo 150 palavras)</span> <span class="req">*</span></label>
+                <button type="button" class="btn btn-outline btn-sm" data-modal-open="aiAssistantModal" style="padding:0.2rem 0.65rem; font-size:0.75rem; color:#c4b5fd; border-color:rgba(139,92,246,0.3);">
+                  <i class="fas fa-brain"></i> Usar Assistente IA
+                </button>
+              </div>
+              <textarea id="submitAbstract" name="abstract" class="form-control" placeholder="Apresente os objetivos, metodologia aplicada, resultados e conclusões..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="submitField"><span data-i18n="lblField">Área Científica / Temática</span> <span class="req">*</span></label>
+              <select id="submitField" name="field" class="form-control" required>
+                <option value="">Selecione a Área Temática...</option>
+                <option value="Ciência da Computação & IA">Ciência da Computação, IA & Tecnologias Emergentes</option>
+                <option value="Energias Renováveis & Engenharia">Energias Renováveis & Engenharia</option>
+                <option value="Biotecnologia & Agrociências">Biotecnologia Agrícola & Segurança Alimentar</option>
+                <option value="Ciências da Saúde">Ciências da Saúde & Epidemiologia em África</option>
+                <option value="Economia & Desenvolvimento">Economia & Desenvolvimento Sustentável</option>
+                <option value="Educação Científica & STEM">Educação Científica & Robótica para Juventude</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="submitKeywords"><span data-i18n="lblKeywords">Palavras-Chave (Separadas por vírgula)</span> <span class="req">*</span></label>
+              <input type="text" id="submitKeywords" name="keywords" class="form-control" placeholder="Ex: Inteligência Artificial, Robótica, África, Sustentabilidade" required>
+            </div>
+
+            <!-- Registos Fotográficos (Galeria de Imagens de Eventos, Protótipos ou Conquistas) -->
+            <div class="form-group full-width">
+              <label class="form-label">
+                <i class="fas fa-camera" style="color:var(--gold-primary); margin-right:4px;"></i>
+                <span data-i18n="lblPhotos">Registos Fotográficos (Galeria de Imagens)</span>
+                <small style="color:var(--text-muted);">(Opcional • Recomendado para Histórias, Actividades e Projectos)</small>
+              </label>
+
+              <div class="media-upload-dropzone" id="photosDropzone">
+                <input type="file" id="submitPhotos" name="photos" class="file-input-hidden" multiple accept="image/*">
+                <i class="fas fa-images"></i>
+                <p>Arraste fotos ou clique para carregar múltiplas fotografias</p>
+                <span>Formatos aceites: JPG, PNG, WebP e GIF (até 15MB cada)</span>
+              </div>
+
+              <!-- Pré-visualização da galeria de fotos carregadas -->
+              <div class="photo-preview-grid" id="photoPreviewGrid" style="display:none;"></div>
+            </div>
+
+            <!-- Registos em Vídeo (Link YouTube/Drive ou Ficheiro de Vídeo) -->
+            <div class="form-group full-width">
+              <label class="form-label">
+                <i class="fas fa-video" style="color:#f43f5e; margin-right:4px;"></i>
+                <span data-i18n="lblVideo">Registo em Vídeo (Demonstração, Entrevista, Pitch ou Reportagem)</span>
+                <small style="color:var(--text-muted);">(Opcional)</small>
+              </label>
+
+              <div class="video-inputs-grid">
+                <div>
+                  <input type="url" id="submitVideoUrl" name="video_url" class="form-control" placeholder="Link do Vídeo (YouTube, Vimeo, Google Drive)">
+                  <small style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:4px;">
+                    <i class="fab fa-youtube" style="color:#f43f5e;"></i> Link para reprodução direta no portal
+                  </small>
+                </div>
+                <div>
+                  <input type="file" id="submitVideoFile" name="video_file" class="form-control" accept="video/mp4,video/webm,video/quicktime">
+                  <small style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:4px;">
+                    <i class="fas fa-file-video" style="color:var(--accent-cyan);"></i> Ou envie ficheiro de vídeo (.MP4, .WEBM - até 100MB)
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload de Arquivo / Manuscrito -->
+            <div class="form-group full-width" id="manuscriptGroup">
+              <label class="form-label">
+                <i class="fas fa-file-pdf" style="color:var(--accent-emerald); margin-right:4px;"></i>
+                <span data-i18n="lblFile">Ficheiro do Manuscrito / Documento Complementar</span>
+                <span id="manuscriptReqBadge" class="badge-req-obrig">* (Obrigatório para Artigos Científicos)</span>
+              </label>
+              
+              <div class="file-dropzone" id="manuscriptDropzone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p id="dropzoneMainText" data-i18n="dropzoneText">Arraste e solte o ficheiro PDF ou DOCX aqui ou clique para selecionar</p>
+                <span id="dropzoneSubText" data-i18n="dropzoneFormats">Formatos: .PDF, .DOCX, .DOC (Limite de 30MB)</span>
+                <input type="file" id="manuscriptFile" class="file-input-hidden" accept=".pdf,.docx,.doc" required>
+              </div>
+
+              <div class="file-preview" id="filePreview">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <i class="fas fa-file-pdf" style="color:var(--accent-emerald); font-size:1.3rem;"></i>
+                  <span id="fileNameDisplay">manuscrito.pdf</span>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" id="removeFileBtn" style="color:var(--accent-crimson); border-color:rgba(239,68,68,0.3);">
+                  <i class="fas fa-trash-alt"></i> Remover
+                </button>
+              </div>
+
+              <p id="manuscriptNoticeText" style="font-size:0.76rem; color:var(--text-muted); margin-top:0.45rem;">
+                <i class="fas fa-shield-alt" style="color:var(--gold-primary);"></i>
+                O ficheiro do manuscrito é estritamente obrigatório para artigos científicos. Para histórias, actividades e projectos, o documento é 100% opcional.
+              </p>
+            </div>
+
+            <!-- Termos e Declarações -->
+            <div class="form-group full-width">
+              <div class="declaration-box">
+                <input type="checkbox" id="declarationCheck" required>
+                <label for="declarationCheck" data-i18n="declarationText">
+                  Declaro que este trabalho é original e concordo com os termos de partilha e divulgação aberta no Blog & Tech Hub, com direito à emissão do Certificado Oficial de Publicação.
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div style="font-size: 0.85rem; color: #34d399; font-weight:600;">
+              <i class="fas fa-shield-alt"></i> Acesso Aberto Comunitário • Mentoria Dedicada e Emissão de Certificado Oficial
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg" id="submitButton">
+              <i class="fas fa-paper-plane"></i> <span data-i18n="btnSubmitForm">Submeter Artigo</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: ACOMPANHAMENTO DE SUBMISSÕES
+       ======================================================================== -->
+  <section class="section section-alt" id="rastreamento">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secTrackKicker">Acompanhamento de Artigos</span>
+        <h2 class="section-title" data-i18n="secTrackTitle">Estado da Mentoria & Certificado</h2>
+        <p class="section-subtitle" data-i18n="secTrackSub">
+          Consulte o andamento do seu manuscrito e aceda ao seu Certificado Oficial de Publicação.
+        </p>
+      </div>
+
+      <div class="tracker-box">
+        <form id="trackForm" class="tracker-search">
+          <input type="email" name="trackEmail" class="form-control" placeholder="Introduza o seu e-mail de autor..." data-i18n-placeholder="trackPlaceholder" required>
+          <button type="submit" class="btn btn-primary" style="white-space:nowrap;">
+            <i class="fas fa-search"></i> <span data-i18n="btnTrack">Rastrear Submissão</span>
+          </button>
+        </form>
+        <div id="trackerResults"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: FUNDADOR & MENTOR CIENTÍFICO (SEM EDITOR-CHEFE)
+       ======================================================================== -->
+  <section class="section" id="mentoria">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secFounderKicker">Liderança & Coordenação Científica</span>
+        <h2 class="section-title" data-i18n="secFounderTitle">Fundador & Mentor Científico</h2>
+        <p class="section-subtitle" data-i18n="secFounderSub">
+          Uma iniciativa voltada à soberania tecnológica e científica no continente africano.
+        </p>
+      </div>
+
+      <!-- Destaque Exclusivo do Fundador & Mentor -->
+      <div class="founder-card">
+        <div class="founder-avatar">
+          <div class="founder-avatar-inner">
+            <span>VE</span>
+          </div>
+        </div>
+        <div>
+          <h3 class="founder-name">Valdimir Jacinto Esteves</h3>
+          <div class="founder-role" data-i18n="founderRole">Fundador & Mentor Científico da AfricaWinners</div>
+          <p class="founder-bio" data-i18n="founderBio">
+            Dedicado ao fomento do ecossistema científico, tecnológico e acadêmico em África. Promotor de iniciativas de inclusão científica de base, capacitação tecnológica e mentoria de jovens investigadores.
+          </p>
+          <div class="founder-contacts">
+            <div class="founder-contact-item">
+              <i class="fas fa-building"></i>
+              <span>Escritório Esteves & Multi-Serviços / AfricaWinners</span>
+            </div>
+            <div class="founder-contact-item">
+              <i class="fas fa-envelope"></i>
+              <a href="mailto:escritorioestevesemultisservic@gmail.com">escritorioestevesemultisservic@gmail.com</a>
+            </div>
+            <div class="founder-contact-item">
+              <i class="fas fa-phone-alt"></i>
+              <a href="tel:976161521">976161521</a>
+            </div>
+            <div class="founder-contact-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Luanda, Angola</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: DIRETRIZES PARA AUTORES & ROTEIRO
+       ======================================================================== -->
+  <section class="section section-alt" id="diretrizes">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secGuideKicker">Normas de Publicação</span>
+        <h2 class="section-title" data-i18n="secGuideTitle">Diretrizes & Publicação Aberta</h2>
+        <p class="section-subtitle" data-i18n="secGuideSub">
+          Orientações sobre a estrutura de artigos, mentoria técnica e emissão de certificados.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.5rem;">
+        <div style="background:var(--bg-card); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius-md); padding:1.5rem;">
+          <div style="color:var(--gold-primary); font-size:1.6rem; margin-bottom:0.75rem;"><i class="fas fa-file-alt"></i></div>
+          <h4 style="color:#ffffff; font-size:1.1rem; margin-bottom:0.5rem;">Formatação do Artigo</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.6;">
+            Estrutura sugerida: Título em Português/Inglês/Francês, Resumo estruturado (150-250 palavras), Palavras-chave, Introdução, Metodologia, Resultados e Conclusão.
+          </p>
+        </div>
+
+        <div style="background:var(--bg-card); border:1px solid rgba(16,185,129,0.3); border-radius:var(--radius-md); padding:1.5rem;">
+          <div style="color:#34d399; font-size:1.6rem; margin-bottom:0.75rem;"><i class="fas fa-certificate"></i></div>
+          <h4 style="color:#ffffff; font-size:1.1rem; margin-bottom:0.5rem;">Acesso Aberto & Certificado</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.6;">
+            A submissão no Blog & Tech Hub assegura ampla visibilidade, mentoria técnica dedicada e emissão do Certificado Oficial de Publicação chancelado pelo mentor.
+          </p>
+        </div>
+
+        <div style="background:var(--bg-card); border:1px solid rgba(59,129,194,0.3); border-radius:var(--radius-md); padding:1.5rem;">
+          <div style="color:var(--brand-blue-hover); font-size:1.6rem; margin-bottom:0.75rem;"><i class="fas fa-road"></i></div>
+          <h4 style="color:#ffffff; font-size:1.1rem; margin-bottom:0.5rem;">Rumo a Revista de Alto Calibre</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.6;">
+            Iniciamos com a partilha de histórias e projetos comunitários e progrediremos de forma faseada para uma revista científica internacional indexada de alto calibre.
+          </p>
+        </div>
+
+        <div style="background:var(--bg-card); border:1px solid rgba(139,92,246,0.3); border-radius:var(--radius-md); padding:1.5rem;">
+          <div style="color:#c4b5fd; font-size:1.6rem; margin-bottom:0.75rem;"><i class="fas fa-brain"></i></div>
+          <h4 style="color:#ffffff; font-size:1.1rem; margin-bottom:0.5rem;">Assistência com IA</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.6;">
+            Utilize o Assistente IA da AfricaWinners para aprimorar o seu resumo, gerar palavras-chave e adequar o artigo aos três idiomas oficiais do blog.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECÇÃO: CONTACTOS & FALE CONNOSCO (ESTILO EMPOWERED VOICES)
+       ======================================================================== -->
+  <section class="section" id="contacto">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-kicker" data-i18n="secContactKicker">Canais de Comunicação</span>
+        <h2 class="section-title" data-i18n="secContactTitle">Fale com Valdimir Jacinto Esteves & Equipa</h2>
+        <p class="section-subtitle" data-i18n="secContactSub">
+          Para propostas de parceria, apoio institucional, mentoria científica ou submissões de artigos.
+        </p>
+      </div>
+
+      <div style="max-width:760px; margin:0 auto; background:var(--bg-card); border:1px solid rgba(59,129,194,0.25); border-radius:var(--radius-lg); padding:2.5rem 2rem; text-align:center;">
+        <div style="width:72px; height:72px; border-radius:50%; background:var(--brand-blue-subtle); border:1px solid rgba(59,129,194,0.4); display:inline-flex; align-items:center; justify-content:center; color:var(--brand-blue-hover); font-size:2rem; margin-bottom:1.25rem;">
+          <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <h3 style="color:#ffffff; font-family:var(--font-impact); font-size:1.45rem; margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.03em;">
+          Escritório Esteves & Multi-Serviços
+        </h3>
+        <p style="color:var(--text-secondary); font-size:0.95rem; margin-bottom:1.75rem; line-height:1.7;">
+          Estamos à disposição para acolher o seu manuscrito, projeto ou iniciativa tecnológica. Contacte diretamente a liderança do blog científico.
+        </p>
+        <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+          <a href="mailto:escritorioestevesemultisservic@gmail.com" class="btn btn-brand-pill">
+            <i class="fas fa-envelope"></i> escritorioestevesemultisservic@gmail.com
+          </a>
+          <a href="tel:976161521" class="btn btn-outline-pill">
+            <i class="fas fa-phone-alt"></i> +244 976 161 521
+          </a>
+        </div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">
+          Luanda, Angola • África • Coordenação Editorial & Mentoria
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       MODAL: ASSISTENTE DE INTELIGÊNCIA ARTIFICIAL (Estilo OpenAI)
+       ======================================================================== -->
+  <div class="modal-overlay" id="aiAssistantModal" role="dialog" aria-modal="true">
+    <div class="modal-window modal-wide">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+        <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,#8b5cf6,#6d28d9); display:flex; align-items:center; justify-content:center; color:#ffffff; font-size:1.2rem;">
+          <i class="fas fa-brain"></i>
+        </div>
+        <div>
+          <h3 class="modal-title" style="margin-bottom:0;">Assistente IA de Redação Científica</h3>
+          <span style="font-size:0.78rem; color:#c4b5fd;">OpenAI Architecture Ready • Mentoria Automatizada em 3 Idiomas</span>
+        </div>
+      </div>
+
+      <p class="modal-subtitle">
+        Insira o título ou trecho do seu artigo. O assistente gerará um resumo científico estruturado, palavras-chave e recomendações de impacto nos idiomas Português, Inglês ou Francês.
+      </p>
+
+      <form id="aiAssistantForm">
+        <div class="form-group">
+          <label class="form-label" for="aiTitle">Título Provisório do Artigo</label>
+          <input type="text" id="aiTitle" name="aiTitle" class="form-control" placeholder="Ex: Aplicação de Microrredes Fotovoltaicas no Meio Rural Africano" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="aiText">Rascunho do Resumo ou Texto Principal</label>
+          <textarea id="aiText" name="aiText" class="form-control" placeholder="Cole aqui o seu texto para análise da IA..." rows="4" required></textarea>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+          <div>
+            <label class="form-label" for="aiLang">Idioma Desejado para o Parecer</label>
+            <select id="aiLang" name="aiLang" class="form-control">
+              <option value="pt">Português 🇵🇹</option>
+              <option value="en">English 🇬🇧</option>
+              <option value="fr">Français 🇫🇷</option>
+            </select>
+          </div>
+          <div style="display:flex; align-items:flex-end;">
+            <button type="submit" class="btn btn-ai btn-block">
+              <i class="fas fa-magic"></i> Analisar & Otimizar Artigo com IA
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div id="aiAssistantResults" style="display:none; margin-top:1.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: CERTIFICADO OFICIAL DE PUBLICAÇÃO ($50 USD)
+       ======================================================================== -->
+  <div class="modal-overlay" id="certificateModal" role="dialog" aria-modal="true">
+    <div class="modal-window modal-wide">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      <div id="certificateModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: AUTENTICAÇÃO COM PALAVRA-PASSE ULTRA SECRETA DO ADMINISTRADOR
+       ======================================================================== -->
+  <div class="modal-overlay" id="adminAuthModal" role="dialog" aria-modal="true">
+    <div class="modal-window" style="max-width: 480px; border: 1px solid var(--gold-border); box-shadow: 0 10px 40px rgba(0,0,0,0.85); background: linear-gradient(180deg, #091428 0%, #050b16 100%);">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(212,175,55,0.14); border: 2px solid var(--gold-primary); display: inline-flex; align-items: center; justify-content: center; color: var(--gold-primary); font-size: 1.75rem; margin-bottom: 1rem; box-shadow: 0 0 20px rgba(212,175,55,0.25);">
+          <i class="fas fa-user-lock"></i>
+        </div>
+        <div style="display:inline-block; padding: 0.2rem 0.8rem; background: rgba(212,175,55,0.1); border: 1px solid var(--gold-border); border-radius: var(--radius-full); font-size: 0.75rem; color: var(--gold-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
+          <i class="fas fa-shield-alt"></i> Controlo de Segurança
+        </div>
+        <h3 class="modal-title" style="font-size: 1.35rem; margin-bottom: 0.4rem; color: #ffffff;">Palavra-Passe Ultra Secreta</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+          Acesso reservado ao Mentor & Fundador <strong>Valdimir Jacinto Esteves</strong> para gestão editorial, aprovação de artigos e rede de parceiros.
+        </p>
+      </div>
+
+      <form id="adminAuthForm" onsubmit="handleAdminSecretSubmit(event)">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label class="form-label" for="adminSecretKeyInput" style="margin: 0; font-size: 0.88rem;">Chave Ultra Secreta <span class="req">*</span></label>
+            <button type="button" onclick="toggleSecretVisibility()" style="background: none; border: none; color: var(--gold-light); font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+              <i class="fas fa-eye" id="toggleSecretIcon"></i> <span id="toggleSecretText">Mostrar</span>
+            </button>
+          </div>
+          <div style="position: relative;">
+            <input type="password" id="adminSecretKeyInput" name="adminSecretKeyInput" class="form-control" placeholder="Introduza a palavra-passe secreta..." style="padding-right: 2.5rem; letter-spacing: 0.12em; font-family: var(--font-mono); font-size: 0.95rem;" required autofocus autocomplete="current-password">
+            <i class="fas fa-key" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); pointer-events: none;"></i>
+          </div>
+        </div>
+
+        <div id="adminAuthError" style="display: none; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: #f87171; border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; font-size: 0.82rem; margin-bottom: 1.25rem;">
+          <i class="fas fa-exclamation-triangle"></i> Palavra-passe ultra secreta incorreta. Acesso negado.
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeAllModals()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitAdminSecret" style="flex: 2; font-weight: 700;">
+            <i class="fas fa-unlock-alt"></i> Desbloquear Painel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: PAINEL DE ADMINISTRAÇÃO DO MENTOR & UPLOAD DIRETO
+       ======================================================================== -->
+  <div class="modal-overlay" id="adminModal" role="dialog" aria-modal="true">
+    <div class="modal-window modal-admin">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <span class="admin-badge"><i class="fas fa-shield-alt"></i> Painel do Mentor & Administrador</span>
+          <h3 class="modal-title" style="margin-top:0.35rem;">Gestão de Publicações & Mentoria Científica</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Fundador & Mentor: <strong>Valdimir Jacinto Esteves</strong> • Blog & Tech Hub Comunitário</p>
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <button class="btn btn-outline btn-sm" onclick="loadAdminArticles()">
+            <i class="fas fa-sync-alt"></i> Atualizar
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="lockAdminDashboard()" style="color:var(--accent-crimson); border-color:rgba(239,68,68,0.4);" title="Bloquear o Painel de Administração">
+            <i class="fas fa-lock"></i> Bloquear Painel
+          </button>
+        </div>
+      </div>
+
+      <!-- Abas do Administrador -->
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" id="tabBtn-articles" onclick="switchAdminTab('articles')">
+          <i class="fas fa-inbox"></i> Solicitações & Artigos Recebidos
+        </button>
+        <button class="admin-tab-btn" id="tabBtn-direct" onclick="switchAdminTab('direct')">
+          <i class="fas fa-cloud-upload-alt"></i> Publicação Direta (Upload de Ficheiro)
+        </button>
+        <button class="admin-tab-btn" id="tabBtn-partners" onclick="switchAdminTab('partners')">
+          <i class="fas fa-handshake"></i> Adicionar & Gerir Parceiros
+        </button>
+      </div>
+
+      <!-- Conteúdo da Aba 1: Lista de Artigos -->
+      <div class="admin-tab-content" id="tabContent-articles">
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin-bottom:1.5rem;">
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:1rem; border-radius:var(--radius-md); text-align:center;">
+            <div style="font-size:1.6rem; font-weight:700; color:var(--gold-light);" id="adminCountTotal">0</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Total de Artigos</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:1rem; border-radius:var(--radius-md); text-align:center;">
+            <div style="font-size:1.6rem; font-weight:700; color:var(--accent-amber);" id="adminCountPending">0</div>
+            <div style="font-size:0.75rem; color:var(--accent-amber); text-transform:uppercase;">Em Mentoria</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:1rem; border-radius:var(--radius-md); text-align:center;">
+            <div style="font-size:1.6rem; font-weight:700; color:var(--accent-emerald);" id="adminCountPublished">0</div>
+            <div style="font-size:0.75rem; color:var(--accent-emerald); text-transform:uppercase;">Publicados com Certificado</div>
+          </div>
+          <div style="background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); padding:1rem; border-radius:var(--radius-md); text-align:center;">
+            <div style="font-size:1.6rem; font-weight:700; color:var(--accent-cyan);" id="adminCountUsers">0</div>
+            <div style="font-size:0.75rem; color:var(--accent-cyan); text-transform:uppercase;">Investigadores</div>
+          </div>
+        </div>
+
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Título & Área</th>
+                <th>Autor & Contacto</th>
+                <th>Estado</th>
+                <th>Ações</th>
+                <th>Decisão do Mentor</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Conteúdo da Aba 2: Upload e Publicação Direta pelo Administrador -->
+      <div class="admin-tab-content" id="tabContent-direct" style="display:none;">
+        <div style="background:rgba(212,175,55,0.06); border:1px solid var(--gold-border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+          <h4 style="color:#ffffff; margin-bottom:0.25rem;"><i class="fas fa-feather-alt" style="color:var(--gold-primary);"></i> Publicar Ficheiro Diretamente como Administrador</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">
+            Como Mentor e Administrador, pode carregar e publicar artigos imediatamente no blog com validação oficial e emissão de Certificado.
+          </p>
+        </div>
+
+        <form id="adminPublishForm">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+            <!-- Formato da Publicação no Painel Admin -->
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label">Formato da Publicação <span class="req">*</span></label>
+              <div class="pub-type-selector-grid" id="adminPubTypeGrid">
+                <div class="pub-type-card active" data-type="Artigo Científico">
+                  <div class="pub-type-card-icon"><i class="fas fa-file-alt"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>Artigo Científico</strong>
+                    <span>Exige Ficheiro (.PDF/.DOCX)</span>
+                  </div>
+                  <div class="pub-type-rule-badge required-doc"><i class="fas fa-certificate"></i> Com Certificado Oficial • Exige Manuscrito</div>
+                </div>
+
+                <div class="pub-type-card" data-type="História de Vencedor">
+                  <div class="pub-type-card-icon"><i class="fas fa-trophy"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>História de Vencedor</strong>
+                    <span>Sem documento obrigatório</span>
+                  </div>
+                  <div class="pub-type-rule-badge optional-doc"><i class="fas fa-camera"></i> Fotos & Vídeos • Sem Certificação</div>
+                </div>
+
+                <div class="pub-type-card" data-type="Actividade">
+                  <div class="pub-type-card-icon"><i class="fas fa-bullhorn"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>Actividade</strong>
+                    <span>Sem documento obrigatório</span>
+                  </div>
+                  <div class="pub-type-rule-badge optional-doc"><i class="fas fa-bullhorn"></i> Fotos & Vídeos • Sem Certificação</div>
+                </div>
+
+                <div class="pub-type-card" data-type="Projecto">
+                  <div class="pub-type-card-icon"><i class="fas fa-robot"></i></div>
+                  <div class="pub-type-card-info">
+                    <strong>Projecto Tech</strong>
+                    <span>Sem documento obrigatório</span>
+                  </div>
+                  <div class="pub-type-rule-badge optional-doc"><i class="fas fa-robot"></i> Fotos & Vídeos • Sem Certificação</div>
+                </div>
+              </div>
+              <input type="hidden" id="adminPublicationType" name="adminPublicationType" value="Artigo Científico">
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+              <div class="pub-type-feedback-banner" id="adminPubTypeBanner">
+                <div class="banner-icon"><i class="fas fa-info-circle"></i></div>
+                <div class="banner-text" id="adminPubTypeBannerText">
+                  <strong>Artigo Científico:</strong> É necessário fornecer o documento (PDF/DOCX) e terá emissão de <strong>Certificado Oficial</strong>. Histórias, Actividades e Projectos não exigem documento e não possuem certificado.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label" for="adminTitle"><span id="adminLblTitle">Título da Publicação</span> <span class="req">*</span></label>
+              <input type="text" id="adminTitle" name="adminTitle" class="form-control" placeholder="Título da pesquisa, actividade, história ou projecto..." required>
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label" for="adminAbstract"><span id="adminLblAbstract">Resumo / Conteúdo Detalhado</span> <span class="req">*</span></label>
+              <textarea id="adminAbstract" name="adminAbstract" class="form-control" rows="4" placeholder="Descrição completa, metodologia ou narrativa inspiradora..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="adminField">Área Científica / Temática <span class="req">*</span></label>
+              <select id="adminField" name="adminField" class="form-control" required>
+                <option value="Ciência da Computação & IA">Ciência da Computação & IA</option>
+                <option value="Energias Renováveis & Engenharia">Energias Renováveis & Engenharia</option>
+                <option value="Biotecnologia & Agrociências">Biotecnologia & Agrociências</option>
+                <option value="Ciências da Saúde">Ciências da Saúde</option>
+                <option value="Economia & Desenvolvimento">Economia & Desenvolvimento</option>
+                <option value="Educação Científica & STEM">Educação Científica & STEM</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="adminKeywords">Palavras-Chave</label>
+              <input type="text" id="adminKeywords" name="adminKeywords" class="form-control" placeholder="Ex: Inovação, Robótica, África">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="adminAuthorName">Nome do Autor / Responsável</label>
+              <input type="text" id="adminAuthorName" name="adminAuthorName" class="form-control" value="Valdimir Jacinto Esteves (Fundador & Mentor)">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="adminAuthorEmail">E-mail do Autor / Responsável</label>
+              <input type="email" id="adminAuthorEmail" name="adminAuthorEmail" class="form-control" value="escritorioestevesemultisservic@gmail.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="adminInstitution">Instituição / Comunidade</label>
+              <input type="text" id="adminInstitution" name="adminInstitution" class="form-control" value="AfricaWinners / Escritório Esteves & Multi-Serviços">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="adminPhone">Telefone</label>
+              <input type="tel" id="adminPhone" name="adminPhone" class="form-control" value="976161521">
+            </div>
+
+            <!-- Registos Fotográficos (Galeria de Fotos) -->
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label">
+                <i class="fas fa-camera" style="color:var(--gold-primary); margin-right:4px;"></i> Registos Fotográficos (Fotos do Evento, Protótipo ou Conquista) <small style="color:var(--text-muted);">(Opcional)</small>
+              </label>
+              <input type="file" id="adminPhotos" name="adminPhotos" class="form-control" multiple accept="image/*">
+              <div class="photo-preview-grid" id="adminPhotoPreviewGrid" style="display:none; margin-top:0.75rem;"></div>
+            </div>
+
+            <!-- Registos de Vídeo -->
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label">
+                <i class="fas fa-video" style="color:#f43f5e; margin-right:4px;"></i> Registo de Vídeo (Link YouTube/Drive ou Ficheiro MP4) <small style="color:var(--text-muted);">(Opcional)</small>
+              </label>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <input type="url" id="adminVideoUrl" name="adminVideoUrl" class="form-control" placeholder="Link do Vídeo (YouTube, Vimeo, Drive)">
+                <input type="file" id="adminVideoFile" name="adminVideoFile" class="form-control" accept="video/mp4,video/webm,video/quicktime">
+              </div>
+            </div>
+
+            <!-- Ficheiro do Documento (Obrigatório apenas se Artigo Científico) -->
+            <div class="form-group" style="grid-column: span 2;" id="adminDocGroup">
+              <label class="form-label" for="adminDirectFile">
+                <i class="fas fa-file-pdf" style="color:var(--accent-emerald); margin-right:4px;"></i>
+                Ficheiro do Manuscrito (PDF ou DOCX) <span id="adminDocReqBadge" class="badge-req-obrig">* (Obrigatório para Artigo)</span>
+              </label>
+              <input type="file" id="adminDirectFile" name="adminDirectFile" class="form-control" accept=".pdf,.docx,.doc">
+              <small id="adminDocNotice" style="font-size:0.76rem; color:var(--text-muted); display:block; margin-top:4px;">
+                Para Histórias de Vencedor, Actividades e Projectos Tech, o documento não é necessário.
+              </small>
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem; text-align:right;">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fas fa-cloud-upload-alt"></i> Publicar Imediatamente no Blog
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Conteúdo da Aba 3: Adicionar e Gerir Parceiros Institucionais -->
+      <div class="admin-tab-content" id="tabContent-partners" style="display:none;">
+        <div style="background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.25); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+          <h4 style="color:#ffffff; margin-bottom:0.25rem;"><i class="fas fa-handshake" style="color:var(--brand-blue-hover);"></i> Gestão de Parceiros & Rede Institucional</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">
+            Adicione universidades, centros de pesquisa, municípios, polos tecnológicos e iniciativas com os quais a AfricaWinners mantém acordos de cooperação e divulgação. Os parceiros aparecem instantaneamente na secção de Parceiros do portal.
+          </p>
+        </div>
+
+        <form id="adminPartnerForm" onsubmit="handleAddPartner(event)" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:2rem;">
+          <h4 style="color:var(--gold-light); font-size:1rem; margin-bottom:1rem;"><i class="fas fa-plus-circle"></i> Adicionar Novo Parceiro</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="partnerName">Nome da Instituição / Parceiro <span class="req">*</span></label>
+              <input type="text" id="partnerName" name="partnerName" class="form-control" placeholder="Ex: Instituto Tecnológico, Sociedade ou Polo STEM" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="partnerCategory">Âmbito / Categoria <span class="req">*</span></label>
+              <input type="text" id="partnerCategory" name="partnerCategory" class="form-control" placeholder="Ex: Ensino Superior, Robótica, Polo STEM" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="partnerIcon">Ícone Visual</label>
+              <select id="partnerIcon" name="partnerIcon" class="form-control">
+                <option value="fas fa-university">🏛️ Universidade / Instituto (fa-university)</option>
+                <option value="fas fa-laptop-code">💻 Engenharia & Robótica (fa-laptop-code)</option>
+                <option value="fas fa-microchip">🔬 Polo Tecnológico & Makers (fa-microchip)</option>
+                <option value="fas fa-book-reader">📚 Sociedade Científica / Livraria (fa-book-reader)</option>
+                <option value="fas fa-city">🏙️ Município / Governo Local (fa-city)</option>
+                <option value="fas fa-hands-helping">🤝 Impacto Comunitário (fa-hands-helping)</option>
+                <option value="fas fa-network-wired">🌐 Rede de Inovação Aberta (fa-network-wired)</option>
+                <option value="fas fa-award">🏆 Escritório & Entidade Oficial (fa-award)</option>
+                <option value="fas fa-atom">⚛️ Pesquisa Científica & Física (fa-atom)</option>
+                <option value="fas fa-heartbeat">🩺 Saúde Pública & Medicina (fa-heartbeat)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="partnerWebsite">Website / Link (Opcional)</label>
+              <input type="url" id="partnerWebsite" name="partnerWebsite" class="form-control" placeholder="https://www.exemplo.ao">
+            </div>
+          </div>
+          <div style="margin-top:1rem; text-align:right;">
+            <button type="submit" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus"></i> Adicionar Parceiro à Rede
+            </button>
+          </div>
+        </form>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h4 style="color:#ffffff; font-size:1rem; margin:0;"><i class="fas fa-list"></i> Parceiros Atuais na Rede</h4>
+          <button type="button" class="btn btn-outline btn-sm" onclick="loadAdminPartners()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+        </div>
+        <div id="adminPartnersList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1rem;">
+          <!-- Carregado via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: AUTENTICAÇÃO COM GOOGLE / LOGIN (SEM SENHA VISÍVEL)
+       ======================================================================== -->
+  <div class="modal-overlay" id="loginModal" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      <h3 class="modal-title">Entrar na AfricaWinners</h3>
+      <p class="modal-subtitle">Aceda à sua conta de autor ou aceda à mentoria.</p>
+
+      <button class="btn-google-auth" id="btnGoogleLogin">
+        <svg viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Entrar com o Google</span>
+      </button>
+
+      <div class="auth-divider">
+        <span>ou utilize as suas credenciais</span>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">E-mail</label>
+          <input type="email" id="loginEmail" name="email" class="form-control" placeholder="seu.email@exemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Palavra-passe</label>
+          <input type="password" id="loginPassword" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+          Entrar na Conta
+        </button>
+      </form>
+
+      <div class="auth-toggle-link">
+        Não possui conta? <a id="switchToRegister">Criar Conta</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: REGISTO ACADÉMICO
+       ======================================================================== -->
+  <div class="modal-overlay" id="registerModal" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      <h3 class="modal-title">Registo & Autenticação</h3>
+      <p class="modal-subtitle">Crie o seu perfil oficial e fique imediatamente autenticado.</p>
+
+      <button class="btn-google-auth">
+        <svg viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Registar com o Google</span>
+      </button>
+
+      <div class="auth-divider">
+        <span>ou preencha os dados</span>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label" for="regName">Nome Completo</label>
+          <input type="text" id="regName" name="name" class="form-control" placeholder="Ex: Dr. Manuel António" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regEmail">E-mail</label>
+          <input type="email" id="regEmail" name="email" class="form-control" placeholder="m.antonio@exemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regInstitution">Instituição / Universidade</label>
+          <input type="text" id="regInstitution" name="institution" class="form-control" placeholder="Ex: Universidade Agostinho Neto" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regCountry">País</label>
+          <input type="text" id="regCountry" name="country" class="form-control" value="Angola" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regField">Área Principal de Investigação</label>
+          <input type="text" id="regField" name="field_of_study" class="form-control" placeholder="Ex: Inteligência Artificial, Saúde Pública">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regPhone">Contacto Telefónico</label>
+          <input type="tel" id="regPhone" name="phone" class="form-control" placeholder="Ex: 976161521">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regPassword">Palavra-passe</label>
+          <input type="password" id="regPassword" name="password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+          Criar Conta & Autenticar
+        </button>
+      </form>
+
+      <div class="auth-toggle-link">
+        Já tem uma conta? <a id="switchToLogin">Fazer Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: DETALHES DO ARTIGO / RESUMO
+       ======================================================================== -->
+  <div class="modal-overlay" id="articleDetailsModal" role="dialog" aria-modal="true">
+    <div class="modal-window modal-wide">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      <div id="articleModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: VISUALIZADOR DE REGISTOS FOTOGRÁFICOS (LIGHTBOX)
+       ======================================================================== -->
+  <div class="modal-overlay" id="photoLightboxModal" role="dialog" aria-modal="true">
+    <div class="modal-window" style="max-width:880px; padding:1.5rem; text-align:center; background:rgba(6,14,26,0.98); border:1px solid var(--gold-border);">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      <div style="position:relative; display:inline-block; max-width:100%;">
+        <img id="lightboxImage" src="" alt="Registo Fotográfico Ampliado" style="max-width:100%; max-height:75vh; border-radius:var(--radius-md); object-fit:contain; box-shadow:0 0 30px rgba(0,0,0,0.8);">
+      </div>
+      <div id="lightboxCaption" style="color:var(--text-secondary); margin-top:1rem; font-size:0.92rem; font-weight:500;"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: RECIBO DE SUBMISSÃO
+       ======================================================================== -->
+  <div class="modal-overlay" id="submissionReceiptModal" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      <div id="submissionReceiptContent"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       RODAPÉ DO PORTAL
+       ======================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-column">
+          <div class="logo-container" style="margin-bottom: 1.25rem;">
+            <div class="logo-crest">
+              <i class="fas fa-award"></i>
+            </div>
+            <div class="logo-text">
+              <span class="logo-title">AfricaWinners</span>
+              <span class="logo-subtitle">Scientific Blog & Tech Hub</span>
+            </div>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.25rem;" data-i18n="footerAbout">
+            Plataforma comunitária de inovação, tecnologia e blog científico focada na capacitação da juventude africana rumo a uma revista de alto calibre.
+          </p>
+          <div class="footer-founder-box">
+            <strong data-i18n="footerFounderTitle">Fundador & Mentor Científico:</strong>
+            Valdimir Jacinto Esteves<br>
+            Escritório Esteves & Multi-Serviços
+          </div>
+        </div>
+
+        <div class="footer-column">
+          <h4>Navegação</h4>
+          <ul class="footer-links">
+            <li><a href="#inicio" data-i18n="navHome">Página Inicial</a></li>
+            <li><a href="#pilares" data-i18n="navPillars">Pilares & Vozes</a></li>
+            <li><a href="#parceiros" data-i18n="navPartners">Parceiros</a></li>
+            <li><a href="#artigos" data-i18n="navArticles">Blog & Artigos</a></li>
+            <li><a href="#biblioteca" data-i18n="navLibrary">A Biblioteca</a></li>
+            <li><a href="#de-vida" data-i18n="navBringToLife">Dê Vida às Histórias</a></li>
+            <li><a href="#media-kit" data-i18n="navMediaKit">Mídia Kit & Eventos</a></li>
+            <li><a href="#submissao" data-i18n="navSubmit">Submeter Artigo</a></li>
+            <li><a href="#mentoria" data-i18n="navFounder">Mentor Valdimir</a></li>
+            <li><a href="#contacto" data-i18n="navContact">Contactos</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>Áreas & Recursos</h4>
+          <ul class="footer-links">
+            <li><a href="#artigos">Inteligência Artificial & Robótica</a></li>
+            <li><a href="#artigos">Energias Renováveis & Clima</a></li>
+            <li><a href="#artigos">Biotecnologia & Agrociências</a></li>
+            <li><a href="#artigos">Ciências Médicas & Saúde Pública</a></li>
+            <li><a href="#" data-modal-open="aiAssistantModal">Assistente IA de Redação</a></li>
+            <li><a href="#submissao">Certificado Oficial de Publicação</a></li>
+            <li><a href="#diretrizes">Diretrizes & Normas</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>Contactos de Mentoria</h4>
+          <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Para mentoria acadêmica, parcerias científicas ou submissões:
+          </p>
+          <div style="font-size: 0.86rem; color: #ffffff; margin-bottom: 0.5rem;">
+            <i class="fas fa-envelope" style="color:var(--gold-primary); margin-right:6px;"></i>
+            <a href="mailto:escritorioestevesemultisservic@gmail.com" style="color:var(--gold-light);">escritorioestevesemultisservic@gmail.com</a>
+          </div>
+          <div style="font-size: 0.86rem; color: #ffffff; margin-bottom: 0.5rem;">
+            <i class="fas fa-phone-alt" style="color:var(--gold-primary); margin-right:6px;"></i>
+            <a href="tel:976161521" style="color:var(--gold-light);">976161521</a>
+          </div>
+          <div style="font-size: 0.86rem; color: var(--text-muted);">
+            <i class="fas fa-map-marker-alt" style="color:var(--gold-primary); margin-right:6px;"></i>
+            Luanda, Angola
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2026 <strong>AfricaWinners Scientific Blog & Tech Hub (AWSJ)</strong>. Todos os direitos reservados.
+        </div>
+        <div>
+          Plataforma Comunitária Aberta • Certificação Oficial • ISSN 2959-1082 (Online)
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       BANNER DE CONSENTIMENTO DE COOKIES (ESTILO EMPOWERED VOICES)
+       ======================================================================== -->
+  <div class="cookie-banner hidden" id="cookieBanner" role="dialog" aria-label="Consentimento de Cookies">
+    <div class="cookie-banner-text">
+      <h4 data-i18n="cookieTitle">Este website utiliza cookies</h4>
+      <p data-i18n="cookieText">
+        Utilizamos cookies para analisar o tráfego do website e otimizar a sua experiência. Ao aceitar o uso de cookies, os seus dados serão agregados aos de outros utilizadores para fins estatísticos e de melhoria contínua da plataforma científica.
+      </p>
+    </div>
+    <div class="cookie-banner-actions">
+      <button type="button" class="btn btn-outline-pill btn-sm" id="cookieDeclineBtn" data-i18n="cookieDecline">Recusar</button>
+      <button type="button" class="btn btn-brand-pill btn-sm" id="cookieAcceptBtn" data-i18n="cookieAccept">Aceitar</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
