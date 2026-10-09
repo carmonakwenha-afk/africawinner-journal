@@ -468,8 +468,8 @@ app.post('/api/articles/submit', upload.any(), async (req, res) => {
     const randomSuffix = Math.floor(100 + Math.random() * 900);
     // A certificação é EXCLUSIVA para quem publica artigos científicos:
     const certCode = isArticle ? `AWSJ-CERT-2026-${Date.now().toString().slice(-4)}${randomSuffix}` : null;
-    const relativePdfPath = manuscriptFile ? ('uploads/' + manuscriptFile.filename) : null;
-    const originalPdfName = manuscriptFile ? manuscriptFile.originalname : null;
+    const relativePdfPath = manuscriptFile ? ('uploads/' + manuscriptFile.filename) : "";
+    const originalPdfName = manuscriptFile ? manuscriptFile.originalname : "";
 
     const finalVideoUrl = (video_url && video_url.trim()) ? video_url.trim() : (videoPath || null);
     const finalImagesJson = photoPaths.length > 0 ? JSON.stringify(photoPaths) : null;
@@ -576,8 +576,8 @@ app.post('/api/admin/articles/direct-publish', requireAdmin, upload.any(), async
     const randomSuffix = Math.floor(100 + Math.random() * 900);
     const officialDoi = custom_doi ? custom_doi.trim() : null;
     const certCode = isArticle ? `AWSJ-CERT-2026-${Date.now().toString().slice(-4)}${randomSuffix}` : null;
-    const relativePdfPath = manuscriptFile ? ('uploads/' + manuscriptFile.filename) : null;
-    const originalPdfName = manuscriptFile ? manuscriptFile.originalname : null;
+    const relativePdfPath = manuscriptFile ? ('uploads/' + manuscriptFile.filename) : "";
+    const originalPdfName = manuscriptFile ? manuscriptFile.originalname : "";
 
     const finalVideoUrl = (video_url && video_url.trim()) ? video_url.trim() : (videoPath || null);
     const finalImagesJson = photoPaths.length > 0 ? JSON.stringify(photoPaths) : null;
