@@ -54,7 +54,7 @@ function initDatabase() {
         institution TEXT NOT NULL,
         author_email TEXT NOT NULL,
         phone TEXT,
-        pdf_path TEXT NOT NULL,
+        pdf_path TEXT,
         pdf_original_name TEXT,
         status TEXT DEFAULT 'Published',
         doi TEXT,
@@ -285,7 +285,7 @@ function initDatabase() {
             [
               art.title, art.abstract, art.keywords, art.field,
               art.author_name, art.institution, art.author_email,
-              art.pdf_path, art.pdf_original_name, art.status, art.doi,
+              art.pdf_path || "", art.pdf_original_name || "", art.status, art.doi,
               art.certificate_id, art.fee_amount, art.fee_status, art.published_by,
               art.publication_type, art.images, art.video_url,
               art.views_count, art.downloads_count
