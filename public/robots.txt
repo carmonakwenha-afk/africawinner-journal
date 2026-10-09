@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://africawinner-journal.onrender.com/sitemap.xml
