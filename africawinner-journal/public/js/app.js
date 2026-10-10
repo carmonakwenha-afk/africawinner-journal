@@ -545,20 +545,55 @@ const I18N = {
 // ARMAZENAMENTO PERSISTENTE (FIREBASE HOSTING & OFFLINE-FIRST)
 // Garante que todas as publicações e alterações do Administrador NUNCA se apaguem
 // ==========================================================================
+// ==========================================================================
+// ARMAZENAMENTO PERSISTENTE & CONTROLO EDITORIAL ESTRITO (FIREBASE HOSTING)
+// ==========================================================================
+
+function getDeletedArticleIds() {
+  try {
+    const raw = localStorage.getItem('awsj_deleted_article_ids');
+    if (raw) return new Set(JSON.parse(raw).map(String));
+  } catch (e) {}
+  return new Set();
+}
+
+function markArticleAsDeleted(articleId) {
+  if (!articleId) return;
+  const idStr = String(articleId);
+  const ids = getDeletedArticleIds();
+  ids.add(idStr);
+  try {
+    localStorage.setItem('awsj_deleted_article_ids', JSON.stringify([...ids]));
+  } catch (e) {}
+  if (db) {
+    try {
+      db.collection('deleted_articles').doc(idStr).set({
+        deletedAt: new Date().toISOString(),
+        id: idStr
+      });
+    } catch (e) {}
+  }
+}
+
 function getSavedArticles() {
   const saved = localStorage.getItem('awsj_custom_articles');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) {
+        const deletedIds = getDeletedArticleIds();
+        return parsed.filter(a => a && a.id && !deletedIds.has(String(a.id)));
+      }
     } catch(e) {}
   }
-  return (typeof defaultArticlesData !== 'undefined' && Array.isArray(defaultArticlesData)) ? defaultArticlesData : [];
+  return [];
 }
 
 function saveArticlesLocally(articles) {
   try {
-    localStorage.setItem('awsj_custom_articles', JSON.stringify(articles || []));
+    const deletedIds = getDeletedArticleIds();
+    const clean = (articles || []).filter(a => a && a.id && !deletedIds.has(String(a.id)));
+    localStorage.setItem('awsj_custom_articles', JSON.stringify(clean));
   } catch(e) {
     console.warn('Erro ao salvar artigos localmente:', e);
   }
@@ -624,10 +659,12 @@ async function saveArticleToCloud(article) {
 
 async function deleteArticleFromCloud(articleId) {
   if (!articleId) return;
+  const docId = String(articleId);
+  markArticleAsDeleted(docId);
   if (db) {
     try {
-      await db.collection('articles').doc(String(articleId)).delete();
-      console.log('🗑️ Artigo removido do Cloud Firestore:', articleId);
+      await db.collection('articles').doc(docId).delete();
+      console.log('🗑️ Artigo removido definitivamente do Cloud Firestore:', docId);
     } catch (err) {
       console.warn('Aviso ao remover do Firestore:', err);
     }
@@ -651,27 +688,50 @@ function initCloudSync() {
   }
 
   try {
+    // 1. Ouvinte para artigos excluídos (garante que itens apagados fiquem apagados em todos os aparelhos)
+    db.collection('deleted_articles').onSnapshot((snapshot) => {
+      const ids = getDeletedArticleIds();
+      let changed = false;
+      snapshot.forEach(doc => {
+        const dId = String(doc.id);
+        if (!ids.has(dId)) {
+          ids.add(dId);
+          changed = true;
+        }
+      });
+      if (changed) {
+        try {
+          localStorage.setItem('awsj_deleted_article_ids', JSON.stringify([...ids]));
+        } catch (e) {}
+        State.articles = (State.articles || []).filter(a => a && !ids.has(String(a.id)));
+        saveArticlesLocally(State.articles);
+        renderArticles();
+        loadAdminArticles();
+        fetchJournalStats();
+      }
+    }, () => {});
+
+    // 2. Ouvinte de publicações em tempo real
     db.collection('articles').onSnapshot((snapshot) => {
       const cloudArticles = [];
+      const deletedIds = getDeletedArticleIds();
+
       snapshot.forEach((doc) => {
         const item = doc.data();
         if (item) {
           if (!item.id) item.id = doc.id;
-          cloudArticles.push(item);
+          const idStr = String(item.id);
+          // Ignora estritamente qualquer publicação eliminada
+          if (!deletedIds.has(idStr)) {
+            cloudArticles.push(item);
+          }
         }
       });
 
-      if (cloudArticles.length > 0) {
-        cloudArticles.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
-        State.articles = cloudArticles;
-        saveArticlesLocally(State.articles);
-      } else {
-        const local = getSavedArticles();
-        if (local && local.length > 0) {
-          State.articles = local;
-          local.forEach(a => saveArticleToCloud(a));
-        }
-      }
+      cloudArticles.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+      State.articles = cloudArticles;
+      saveArticlesLocally(State.articles);
+
       renderArticles();
       loadAdminArticles();
       fetchJournalStats();
@@ -680,6 +740,7 @@ function initCloudSync() {
       renderArticles();
     });
 
+    // 3. Ouvinte de parceiros
     db.collection('partners').onSnapshot((snapshot) => {
       const cloudPartners = [];
       snapshot.forEach(doc => cloudPartners.push(doc.data()));
@@ -694,92 +755,8 @@ function initCloudSync() {
   }
 }
 
-const defaultArticlesData = [
-  {
-    id: 1,
-    title: 'Metodologia de Mentoria Científica e Documentação Acadêmica para Jovens Investigadores em África',
-    abstract: 'Introdução: A produção e divulgação científica em comunidades emergentes africanas enfrenta lacunas de mentoria estruturada e acesso a normas metodológicas internacionais.\n\nMetodologia: O estudo analisa um modelo de capacitação editorial e oficinas de redação acadêmica (normas IMRyD) aplicadas pelo AfricaWinners Hub entre 2025 e 2026.\n\nResultados: Constatou-se uma evolução significativa na qualidade formal dos manuscritos, rigor metodológico e apropriação das diretrizes de publicação científica.\n\nConclusão: A mentoria de base comunitária aliada a repositórios de acesso aberto é um vetor indispensável para a soberania científica africana.',
-    keywords: 'Mentoria Científica, Metodologia IMRyD, Educação em África, AfricaWinners, Acesso Aberto',
-    field: 'Educação & Sociedade',
-    author_name: 'Valdimir Jacinto Esteves',
-    author_email: 'escritorioestevesemultisservic@gmail.com',
-    institution: 'Escritório Esteves & Multi-Serviços / AfricaWinners Hub',
-    phone: '976161521',
-    publication_type: 'Artigo Científico',
-    contribution_type: 'Artigo Científico',
-    pdf_path: 'uploads/artigo-metodologia-mentoria.pdf',
-    images: null,
-    video_url: '',
-    status: 'Published',
-    certificate_id: 'AWSJ-CERT-2026-0001',
-    views_count: 142,
-    downloads_count: 28,
-    created_at: '2026-01-15T10:00:00.000Z'
-  },
-  {
-    id: 2,
-    title: 'Superação e Liderança: A Jornada de Inovação de Jovens Talentos Comunitários',
-    abstract: 'Relato de experiência e superação de jovens inovadores comunitários que, através da orientação técnica do Mentor Valdimir Jacinto Esteves e espírito colaborativo, desenvolveram soluções práticas para as suas comunidades. Uma demonstração de que talento, esforço e mentoria geram conquistas duradouras.',
-    keywords: 'Histórias de Vencedor, Resiliência, Liderança Jovem, Inovação Social',
-    field: 'Educação & Sociedade',
-    author_name: 'Equipa Editorial AfricaWinners',
-    author_email: 'escritorioestevesemultisservic@gmail.com',
-    institution: 'Comunidade AfricaWinners',
-    phone: '976161521',
-    publication_type: 'História de Vencedor',
-    contribution_type: 'História de Vencedor',
-    pdf_path: null,
-    images: null,
-    video_url: '',
-    status: 'Published',
-    certificate_id: null,
-    views_count: 98,
-    downloads_count: 0,
-    created_at: '2026-02-10T14:30:00.000Z'
-  },
-  {
-    id: 3,
-    title: 'I Jornada Comunitária de Divulgação Científica e STEM em Luanda',
-    abstract: 'Registo e memórias da jornada comunitária realizada com estudantes e professores, promovendo palestras de incentivo à pesquisa, introdução ao pensamento científico e oficinas práticas de tecnologia para a juventude.',
-    keywords: 'Actividade Comunitária, STEM, Extensão Universitária, Divulgação Científica',
-    field: 'Robótica & STEM',
-    author_name: 'Coordenação Editorial AfricaWinners',
-    author_email: 'escritorioestevesemultisservic@gmail.com',
-    institution: 'AfricaWinners Tech Hub',
-    phone: '976161521',
-    publication_type: 'Actividade',
-    contribution_type: 'Actividade',
-    pdf_path: null,
-    images: null,
-    video_url: '',
-    status: 'Published',
-    certificate_id: null,
-    views_count: 76,
-    downloads_count: 0,
-    created_at: '2026-03-05T09:15:00.000Z'
-  },
-  {
-    id: 4,
-    title: 'Protótipo Comunitário de Automação e Sensores de Baixo Custo para Escolas Técnicas',
-    abstract: 'Projeto de engenharia de protótipo desenvolvido no Tech Hub utilizando componentes acessíveis e controladores abertos para demonstração de princípios físicos e automação em salas de aula e oficinas comunitárias.',
-    keywords: 'Projecto Maker, Robótica, Automação, Hardware Aberto, STEM África',
-    field: 'Sistemas & IA',
-    author_name: 'Núcleo Maker AfricaWinners',
-    author_email: 'escritorioestevesemultisservic@gmail.com',
-    institution: 'Laboratório & Tech Hub AfricaWinners',
-    phone: '976161521',
-    publication_type: 'Projecto',
-    contribution_type: 'Projecto',
-    pdf_path: null,
-    images: null,
-    video_url: '',
-    status: 'Published',
-    certificate_id: null,
-    views_count: 53,
-    downloads_count: 0,
-    created_at: '2026-03-20T11:00:00.000Z'
-  }
-];
+// Zero artigos falsos ou não solicitados: apenas conteúdo real aprovado pelo Administrador
+const defaultArticlesData = [];
 
 const defaultPartnersData = [
   { id: 3, name: 'Sociedades Científicas Africanas', category: 'Pesquisa & Patrimônio Acadêmico', icon: 'fas fa-book-reader', website_url: '#' },
@@ -1694,6 +1671,74 @@ function lockAdminDashboard() {
   showToast('Painel do Administrador bloqueado com segurança.', 'info');
 }
 
+
+function openEditArticleModal(artId) {
+  const art = (State.articles || []).find(a => String(a.id) === String(artId));
+  if (!art) {
+    showToast('Publicação não encontrada para edição.', 'error');
+    return;
+  }
+  const form = document.getElementById('adminEditArticleForm');
+  if (!form) return;
+
+  document.getElementById('editArticleId').value = art.id;
+  document.getElementById('editArticleTitle').value = art.title || '';
+  document.getElementById('editArticleField').value = art.field || 'Sistemas & IA';
+  document.getElementById('editArticleStatus').value = art.status || 'Published';
+  document.getElementById('editArticleAuthor').value = art.author_name || '';
+  document.getElementById('editArticleInstitution').value = art.institution || '';
+  document.getElementById('editArticleKeywords').value = art.keywords || '';
+  document.getElementById('editArticleAbstract').value = art.abstract || '';
+  document.getElementById('editArticleVideo').value = art.video_url || '';
+
+  openModal('adminEditArticleModal');
+}
+
+async function handleAdminEditArticleSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const artId = form.editArticleId.value;
+  const submitBtn = document.getElementById('btnSaveEditArticle');
+
+  const art = (State.articles || []).find(a => String(a.id) === String(artId));
+  if (!art) {
+    showToast('Publicação não encontrada.', 'error');
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A guardar...';
+  }
+
+  art.title = form.title.value.trim();
+  art.field = form.field.value;
+  art.status = form.status.value;
+  art.author_name = form.author_name.value.trim();
+  art.institution = form.institution.value.trim();
+  art.keywords = form.keywords.value.trim();
+  art.abstract = form.abstract.value.trim();
+  art.video_url = form.video_url ? form.video_url.value.trim() : '';
+  art.updated_at = new Date().toISOString();
+
+  saveArticlesLocally(State.articles);
+  await saveArticleToCloud(art);
+
+  closeAllModals();
+  openModal('adminModal');
+  switchAdminTab('articles');
+  renderArticles();
+  loadAdminArticles();
+  fetchJournalStats();
+
+  showToast('Publicação atualizada e salva na nuvem com sucesso!', 'success');
+
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Alterações';
+  }
+}
+
 function renderAdminArticlesList(articles, container) {
   if (!container) return;
   if (!articles || articles.length === 0) {
@@ -1899,9 +1944,13 @@ async function quickPublishArticle(articleId) {
 }
 
 async function deleteArticle(articleId) {
-  const art = (State.articles || []).find(a => String(a.id) === String(articleId));
-  const title = art ? art.title : `Artigo #${articleId}`;
-  if (!confirm(`Tem a certeza que deseja eliminar permanentemente o Artigo #${articleId} ("${title}")? Esta solicitação será removida de todo o sistema.`)) {
+  if (!articleId) return;
+  const idStr = String(articleId);
+  const art = (State.articles || []).find(a => String(a.id) === idStr);
+  const title = art ? art.title : `Publicação #${articleId}`;
+  if (!confirm(`Tem a certeza que deseja eliminar permanentemente a publicação #${articleId} ("${title}")?
+
+Esta publicação será excluída definitivamente da nuvem e NUNCA mais voltará a aparecer.`)) {
     return;
   }
 
@@ -1909,10 +1958,17 @@ async function deleteArticle(articleId) {
   document.getElementById(`admin-article-row-${articleId}`)?.remove();
   document.getElementById(`artigo-${articleId}`)?.remove();
 
-  // 2. Remove do Estado Global
-  State.articles = State.articles.filter(a => String(a.id) !== String(articleId));
+  // 2. Registra na lista permanente de eliminados (Cloud Firestore + LocalStorage)
+  markArticleAsDeleted(idStr);
 
-  // 3. Atualiza contadores visuais
+  // 3. Remove do Estado Global e salva localmente
+  State.articles = (State.articles || []).filter(a => String(a.id) !== idStr);
+  saveArticlesLocally(State.articles);
+
+  // 4. Remove definitivamente do Cloud Firestore
+  await deleteArticleFromCloud(idStr);
+
+  // 5. Atualiza contadores visuais
   const countTotal = document.getElementById('adminCountTotal');
   if (countTotal) countTotal.innerText = State.articles.length;
   const countPublished = document.getElementById('adminCountPublished');
@@ -1925,29 +1981,37 @@ async function deleteArticle(articleId) {
   const statSub = document.getElementById('statSubmissions');
   if (statSub) statSub.innerText = State.articles.length;
 
-  // 4. Feedback imediato ao utilizador
-  showToast(`Artigo #${articleId} eliminado com sucesso de todo o portal!`, 'info');
+  // 6. Feedback imediato ao utilizador
+  showToast(`Publicação #${articleId} eliminada permanentemente da nuvem!`, 'info');
 
-  // 5. Re-renderiza o blog se estiver no ecrã
+  // 7. Re-renderiza o blog se estiver no ecrã
   renderArticles();
+  loadAdminArticles();
+  fetchJournalStats();
+}
 
-  // Se a tabela do admin ficou vazia, mostra mensagem
-  const tableBody = document.getElementById('adminTableBody');
-  if (tableBody && State.articles.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Nenhum artigo ou solicitação recebida ainda.</td></tr>`;
-  }
+async function purgeUnwantedArticles() {
+  if (!confirm('Deseja eliminar todas as publicações não aprovadas ou artigos de demonstração anteriores (IDs 1, 2, 3, 4)?
 
-  // 6. Envia pedido DELETE para a API do backend
-  try {
-    await fetch(`${API_BASE}/api/admin/articles/${articleId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${State.token}`
-      }
-    });
-  } catch (err) {
-    // Já eliminado na interface
+Apenas as publicações reais aprovadas pelo administrador serão mantidas.')) {
+    return;
   }
+  const toDelete = (State.articles || []).filter(a => ['1','2','3','4'].includes(String(a.id)) || a.status !== 'Published');
+  if (toDelete.length === 0) {
+    showToast('Não há publicações de demonstração ou não aprovadas para limpar.', 'info');
+    return;
+  }
+  for (const art of toDelete) {
+    const idStr = String(art.id);
+    markArticleAsDeleted(idStr);
+    await deleteArticleFromCloud(idStr);
+    State.articles = (State.articles || []).filter(a => String(a.id) !== idStr);
+  }
+  saveArticlesLocally(State.articles);
+  renderArticles();
+  loadAdminArticles();
+  fetchJournalStats();
+  showToast(`Limpeza concluída! ${toDelete.length} publicação(ões) eliminada(s) com sucesso da nuvem.`, 'success');
 }
 
 // Manipular Publicação Direta do Administrador
@@ -2484,7 +2548,19 @@ function renderArticles() {
   const grid = document.getElementById('articlesGrid');
   if (!grid) return;
 
-  const filtered = State.articles.filter(art => {
+  const deletedIds = getDeletedArticleIds();
+
+  const filtered = (State.articles || []).filter(art => {
+    if (!art || !art.id) return false;
+
+    // ELIMINAÇÃO ESTRITA: se foi eliminado pelo administrador, NUNCA exibe
+    if (deletedIds.has(String(art.id))) return false;
+
+    // REGRA DE OURO: Apenas publicações APROVADAS pelo administrador aparecem na área pública do Blog!
+    // Artigos em 'Under Peer Review', 'Submitted', 'Revisões Solicitadas' ou 'Rejected'
+    // só aparecem no Painel Editorial do Administrador para revisão!
+    if (art.status !== 'Published') return false;
+
     // 1. Filtro por Área Temática
     const matchesField = State.activeField === 'all' || art.field === State.activeField;
 
@@ -2502,9 +2578,9 @@ function renderArticles() {
 
     // 3. Pesquisa textual
     const matchesSearch = !State.searchQuery ||
-      art.title.toLowerCase().includes(State.searchQuery) ||
-      art.abstract.toLowerCase().includes(State.searchQuery) ||
-      art.author_name.toLowerCase().includes(State.searchQuery) ||
+      (art.title && art.title.toLowerCase().includes(State.searchQuery)) ||
+      (art.abstract && art.abstract.toLowerCase().includes(State.searchQuery)) ||
+      (art.author_name && art.author_name.toLowerCase().includes(State.searchQuery)) ||
       (art.doi && art.doi.toLowerCase().includes(State.searchQuery)) ||
       (art.keywords && art.keywords.toLowerCase().includes(State.searchQuery));
 
@@ -2514,15 +2590,15 @@ function renderArticles() {
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--gold-border);">
-        <i class="fas fa-search" style="font-size: 2.5rem; color: var(--gold-primary); margin-bottom: 1rem;"></i>
-        <h4 style="color:#ffffff; margin-bottom:0.5rem;">Nenhuma publicação encontrada</h4>
-        <p style="color:var(--text-muted); font-size:0.9rem;">Tente ajustar os filtros de formato ou termos de pesquisa.</p>
+        <i class="fas fa-feather-alt" style="font-size: 2.5rem; color: var(--gold-primary); margin-bottom: 1rem;"></i>
+        <h4 style="color:#ffffff; margin-bottom:0.5rem;">Nenhuma publicação aprovada no momento</h4>
+        <p style="color:var(--text-muted); font-size:0.9rem;">Todas as publicações e submissões são validadas pela Direção Editorial antes de serem divulgadas no portal.</p>
       </div>
     `;
     return;
   }
 
-  grid.innerHTML = filtered.map(art => {
+  grid.innerHTML = filtered.mapgrid.innerHTML = filtered.map(art => {
     const rawType = art.publication_type || art.contribution_type || 'Artigo Científico';
     let typeClass = 'badge-pub-artigo';
     let typeIcon = 'fas fa-file-alt';

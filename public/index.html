@@ -1157,6 +1157,15 @@
           </div>
         </div>
 
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; background:rgba(217,119,6,0.08); padding:0.65rem 1rem; border-radius:var(--radius-sm); border:1px solid rgba(217,119,6,0.25);">
+          <div style="font-size:0.83rem; color:var(--text-main);">
+            <i class="fas fa-shield-alt" style="color:var(--gold-primary); margin-right:4px;"></i> Apenas publicações com estado <strong>"Publicado"</strong> aparecem na área pública. Itens eliminados nunca mais retornam.
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="purgeUnwantedArticles()" style="color:#ef4444; border-color:rgba(239,68,68,0.5); font-size:0.75rem; padding:0.35rem 0.75rem;">
+            <i class="fas fa-trash-alt"></i> Limpar Artigos de Teste / Não Solicitados
+          </button>
+        </div>
+
         <div class="admin-table-container">
           <table class="admin-table">
             <thead>
@@ -1703,6 +1712,6 @@
   <script src="/__/firebase/init.js"></script>
 
   <!-- Scripts do Portal -->
-  <script src="js/app.js?v=20261010_botoes_ok"></script>
+  <script src="js/app.js?v=20261010_admin_strict"></script>
 </body>
 </html>
