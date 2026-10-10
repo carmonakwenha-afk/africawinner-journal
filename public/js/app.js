@@ -11,6 +11,246 @@ function savePartnersLocally(p){try{localStorage.setItem('awsj_custom_partners',
  * Idiomas: Português 🇵🇹, Inglês 🇬🇧, Francês 🇫🇷
  */
 
+// ==========================================================================
+// ARMAZENAMENTO PERSISTENTE (FIREBASE HOSTING & OFFLINE-FIRST)
+// Garante que todas as publicações e alterações do Administrador NUNCA se apaguem
+// ==========================================================================
+function getSavedArticles() {
+  const saved = localStorage.getItem('awsj_custom_articles');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch(e) {}
+  }
+  return (typeof defaultArticlesData !== 'undefined' && Array.isArray(defaultArticlesData)) ? defaultArticlesData : [];
+}
+
+function saveArticlesLocally(articles) {
+  try {
+    localStorage.setItem('awsj_custom_articles', JSON.stringify(articles || []));
+  } catch(e) {
+    console.warn('Erro ao salvar artigos localmente:', e);
+  }
+}
+
+function getSavedPartners() {
+  const saved = localStorage.getItem('awsj_custom_partners');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  return [
+    { id: 1, name: 'Escritório Esteves & Multi-Serviços', category: 'Coordenação Editorial & Mentoria Científica', icon: 'fas fa-award', website_url: 'mailto:escritorioestevesemultisservic@gmail.com' }
+  ];
+}
+
+function savePartnersLocally(partners) {
+  try {
+    localStorage.setItem('awsj_custom_partners', JSON.stringify(partners || []));
+  } catch(e) {
+    console.warn('Erro ao salvar parceiros localmente:', e);
+  }
+}
+
+// ==========================================================================
+// SINCRONIZAÇÃO EM NUVEM VIA CLOUD FIRESTORE (TEMPO REAL & PERSISTENTE)
+// ==========================================================================
+let db = null;
+try {
+  if (typeof firebase !== 'undefined' && firebase.firestore) {
+    if (!firebase.apps || !firebase.apps.length) {
+      try { firebase.initializeApp({ projectId: 'africawinners-510716' }); } catch (initErr) {}
+    }
+    db = firebase.firestore();
+    console.log('🔥 Cloud Firestore conectado com sucesso ao projeto africawinners-510716');
+  }
+} catch (e) {
+  console.warn('Modo offline/fallback local (Firestore não inicializado):', e);
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveArticleToCloud(article) {
+  if (!article || !article.id) return;
+  saveArticlesLocally(State.articles);
+  if (db) {
+    try {
+      const docId = String(article.id);
+      await db.collection('articles').doc(docId).set(article, { merge: true });
+      console.log('✅ Artigo sincronizado no Cloud Firestore:', docId);
+    } catch (err) {
+      console.warn('Aviso ao sincronizar no Firestore:', err);
+    }
+  }
+}
+
+async function deleteArticleFromCloud(articleId) {
+  if (!articleId) return;
+  if (db) {
+    try {
+      await db.collection('articles').doc(String(articleId)).delete();
+      console.log('🗑️ Artigo removido do Cloud Firestore:', articleId);
+    } catch (err) {
+      console.warn('Aviso ao remover do Firestore:', err);
+    }
+  }
+}
+
+async function savePartnerToCloud(partner) {
+  if (!partner || !partner.id) return;
+  savePartnersLocally(State.partners);
+  if (db) {
+    try {
+      await db.collection('partners').doc(String(partner.id)).set(partner, { merge: true });
+    } catch (e) {}
+  }
+}
+
+function initCloudSync() {
+  if (!db) {
+    renderArticles();
+    return;
+  }
+
+  try {
+    db.collection('articles').onSnapshot((snapshot) => {
+      const cloudArticles = [];
+      snapshot.forEach((doc) => {
+        const item = doc.data();
+        if (item) {
+          if (!item.id) item.id = doc.id;
+          cloudArticles.push(item);
+        }
+      });
+
+      if (cloudArticles.length > 0) {
+        cloudArticles.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+        State.articles = cloudArticles;
+        saveArticlesLocally(State.articles);
+      } else {
+        const local = getSavedArticles();
+        if (local && local.length > 0) {
+          State.articles = local;
+          local.forEach(a => saveArticleToCloud(a));
+        }
+      }
+      renderArticles();
+      loadAdminArticles();
+      fetchJournalStats();
+    }, (err) => {
+      console.warn('Firestore snapshot error, fallback para local:', err);
+      renderArticles();
+    });
+
+    db.collection('partners').onSnapshot((snapshot) => {
+      const cloudPartners = [];
+      snapshot.forEach(doc => cloudPartners.push(doc.data()));
+      if (cloudPartners.length > 0) {
+        State.partners = cloudPartners;
+        savePartnersLocally(State.partners);
+        loadPartners();
+      }
+    }, () => {});
+  } catch (err) {
+    console.warn('Erro ao ligar listener Firestore:', err);
+  }
+}
+
+const defaultArticlesData = [
+  {
+    id: 1,
+    title: 'Metodologia de Mentoria Científica e Documentação Acadêmica para Jovens Investigadores em África',
+    abstract: 'Introdução: A produção e divulgação científica em comunidades emergentes africanas enfrenta lacunas de mentoria estruturada e acesso a normas metodológicas internacionais.\n\nMetodologia: O estudo analisa um modelo de capacitação editorial e oficinas de redação acadêmica (normas IMRyD) aplicadas pelo AfricaWinners Hub entre 2025 e 2026.\n\nResultados: Constatou-se uma evolução significativa na qualidade formal dos manuscritos, rigor metodológico e apropriação das diretrizes de publicação científica.\n\nConclusão: A mentoria de base comunitária aliada a repositórios de acesso aberto é um vetor indispensável para a soberania científica africana.',
+    keywords: 'Mentoria Científica, Metodologia IMRyD, Educação em África, AfricaWinners, Acesso Aberto',
+    field: 'Educação & Sociedade',
+    author_name: 'Valdimir Jacinto Esteves',
+    author_email: 'escritorioestevesemultisservic@gmail.com',
+    institution: 'Escritório Esteves & Multi-Serviços / AfricaWinners Hub',
+    phone: '976161521',
+    publication_type: 'Artigo Científico',
+    contribution_type: 'Artigo Científico',
+    pdf_path: 'uploads/artigo-metodologia-mentoria.pdf',
+    images: null,
+    video_url: '',
+    status: 'Published',
+    certificate_id: 'AWSJ-CERT-2026-0001',
+    views_count: 142,
+    downloads_count: 28,
+    created_at: '2026-01-15T10:00:00.000Z'
+  },
+  {
+    id: 2,
+    title: 'Superação e Liderança: A Jornada de Inovação de Jovens Talentos Comunitários',
+    abstract: 'Relato de experiência e superação de jovens inovadores comunitários que, através da orientação técnica do Mentor Valdimir Jacinto Esteves e espírito colaborativo, desenvolveram soluções práticas para as suas comunidades. Uma demonstração de que talento, esforço e mentoria geram conquistas duradouras.',
+    keywords: 'Histórias de Vencedor, Resiliência, Liderança Jovem, Inovação Social',
+    field: 'Educação & Sociedade',
+    author_name: 'Equipa Editorial AfricaWinners',
+    author_email: 'escritorioestevesemultisservic@gmail.com',
+    institution: 'Comunidade AfricaWinners',
+    phone: '976161521',
+    publication_type: 'História de Vencedor',
+    contribution_type: 'História de Vencedor',
+    pdf_path: null,
+    images: null,
+    video_url: '',
+    status: 'Published',
+    certificate_id: null,
+    views_count: 98,
+    downloads_count: 0,
+    created_at: '2026-02-10T14:30:00.000Z'
+  },
+  {
+    id: 3,
+    title: 'I Jornada Comunitária de Divulgação Científica e STEM em Luanda',
+    abstract: 'Registo e memórias da jornada comunitária realizada com estudantes e professores, promovendo palestras de incentivo à pesquisa, introdução ao pensamento científico e oficinas práticas de tecnologia para a juventude.',
+    keywords: 'Actividade Comunitária, STEM, Extensão Universitária, Divulgação Científica',
+    field: 'Robótica & STEM',
+    author_name: 'Coordenação Editorial AfricaWinners',
+    author_email: 'escritorioestevesemultisservic@gmail.com',
+    institution: 'AfricaWinners Tech Hub',
+    phone: '976161521',
+    publication_type: 'Actividade',
+    contribution_type: 'Actividade',
+    pdf_path: null,
+    images: null,
+    video_url: '',
+    status: 'Published',
+    certificate_id: null,
+    views_count: 76,
+    downloads_count: 0,
+    created_at: '2026-03-05T09:15:00.000Z'
+  },
+  {
+    id: 4,
+    title: 'Protótipo Comunitário de Automação e Sensores de Baixo Custo para Escolas Técnicas',
+    abstract: 'Projeto de engenharia de protótipo desenvolvido no Tech Hub utilizando componentes acessíveis e controladores abertos para demonstração de princípios físicos e automação em salas de aula e oficinas comunitárias.',
+    keywords: 'Projecto Maker, Robótica, Automação, Hardware Aberto, STEM África',
+    field: 'Sistemas & IA',
+    author_name: 'Núcleo Maker AfricaWinners',
+    author_email: 'escritorioestevesemultisservic@gmail.com',
+    institution: 'Laboratório & Tech Hub AfricaWinners',
+    phone: '976161521',
+    publication_type: 'Projecto',
+    contribution_type: 'Projecto',
+    pdf_path: null,
+    images: null,
+    video_url: '',
+    status: 'Published',
+    certificate_id: null,
+    views_count: 53,
+    downloads_count: 0,
+    created_at: '2026-03-20T11:00:00.000Z'
+  }
+];
+
 const API_BASE = window.location.origin.includes('http') ? '' : 'http://localhost:3000';
 
 // ==========================================================================
@@ -766,6 +1006,9 @@ function setupEventListeners() {
   // Formulário de Upload Direto do Administrador
   const adminPublishForm = document.getElementById('adminPublishForm');
   if (adminPublishForm) adminPublishForm.addEventListener('submit', handleAdminDirectPublish);
+
+  const adminEditForm = document.getElementById('adminEditArticleForm');
+  if (adminEditForm) adminEditForm.addEventListener('submit', handleAdminEditArticleSubmit);
 
   // Assistente de IA
   const aiForm = document.getElementById('aiAssistantForm');
@@ -1562,6 +1805,9 @@ function renderAdminArticlesList(articles, container) {
               <option value="Revisões Solicitadas">Solicitar Revisões</option>
               <option value="Rejected">Rejeitar</option>
             </select>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openEditArticleModal('${art.id}')" style="color:var(--gold-light); border-color:var(--gold-border); padding:0.35rem 0.5rem; font-size:0.78rem; font-weight:700; width:100%; cursor:pointer;" title="Editar informações desta publicação">
+              <i class="fas fa-edit"></i> Editar
+            </button>
             <button type="button" class="btn btn-outline btn-sm" onclick="deleteArticle(${art.id})" style="color:var(--accent-crimson); border-color:rgba(239,68,68,0.5); padding:0.35rem 0.5rem; font-size:0.78rem; font-weight:700; width:100%; cursor:pointer;" title="Eliminar permanentemente este artigo e solicitação">
               <i class="fas fa-trash-alt"></i> Eliminar
             </button>

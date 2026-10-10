@@ -1,10 +1,24 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/*.exe",
+      "**/*.dll",
+      "**/*.bat",
+      "**/*.cmd",
+      "**/*.sh",
+      "**/*.bin",
+      "**/*.apk",
+      "**/*.ipa",
+      "**/*.msi",
+      "**/*.py",
+      "**/*.ps1"
     ],
     "rewrites": [
       {

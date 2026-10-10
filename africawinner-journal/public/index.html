@@ -1526,6 +1526,77 @@
   <!-- ========================================================================
        RODAPÉ DO PORTAL
        ======================================================================== -->
+  
+  <!-- ========================================================================
+       MODAL: EDIÇÃO DE PUBLICAÇÃO PELO ADMINISTRADOR
+       ======================================================================== -->
+  <div class="modal-overlay" id="adminEditArticleModal" role="dialog" aria-modal="true">
+    <div class="modal-window modal-lg">
+      <button class="modal-close" aria-label="Fechar">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-edit" style="color:var(--gold-primary);"></i> Editar Publicação</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Altere as informações da publicação. As alterações serão salvas imediatamente na nuvem e no blog.</p>
+      </div>
+      <form id="adminEditArticleForm">
+        <input type="hidden" id="editArticleId" name="editArticleId">
+        <div class="form-group">
+          <label class="form-label" for="editArticleTitle">Título da Publicação <span class="req">*</span></label>
+          <input type="text" id="editArticleTitle" name="title" class="form-control" required>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" for="editArticleField">Área Temática <span class="req">*</span></label>
+            <select id="editArticleField" name="field" class="form-control" required>
+              <option value="Sistemas &amp; IA">Sistemas &amp; IA</option>
+              <option value="Energia &amp; Ambiente">Energia &amp; Ambiente</option>
+              <option value="Biotecnologia &amp; Agro">Biotecnologia &amp; Agro</option>
+              <option value="Ciências da Saúde">Ciências da Saúde</option>
+              <option value="Robótica &amp; STEM">Robótica &amp; STEM</option>
+              <option value="Educação &amp; Sociedade">Educação &amp; Sociedade</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editArticleStatus">Estado Editorial <span class="req">*</span></label>
+            <select id="editArticleStatus" name="status" class="form-control" required>
+              <option value="Published">Publicado no Blog (Visível a Todos)</option>
+              <option value="Under Peer Review">Em Mentoria / Revisão</option>
+              <option value="Revisões Solicitadas">Revisões Solicitadas</option>
+              <option value="Rejected">Rejeitado</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" for="editArticleAuthor">Autor Principal <span class="req">*</span></label>
+            <input type="text" id="editArticleAuthor" name="author_name" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editArticleInstitution">Instituição / Afiliação</label>
+            <input type="text" id="editArticleInstitution" name="institution" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editArticleKeywords">Palavras-chave (separadas por vírgula)</label>
+          <input type="text" id="editArticleKeywords" name="keywords" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editArticleAbstract">Resumo / Conteúdo Detalhado <span class="req">*</span></label>
+          <textarea id="editArticleAbstract" name="abstract" class="form-control" rows="5" required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editArticleVideo">Link de Vídeo (YouTube ou MP4 - opcional)</label>
+          <input type="url" id="editArticleVideo" name="video_url" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeAllModals()">Cancelar</button>
+          <button type="submit" class="btn btn-brand-pill btn-sm" id="btnSaveEditArticle">
+            <i class="fas fa-save"></i> Guardar Alterações
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
@@ -1626,6 +1697,12 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/app.js"></script>
+  <!-- Firebase App, Firestore & Hosting Auto-Init (Sincronização em Tempo Real) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="/__/firebase/init.js"></script>
+
+  <!-- Scripts do Portal -->
+  <script src="js/app.js?v=20261010_fire"></script>
 </body>
 </html>
