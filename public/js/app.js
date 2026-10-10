@@ -1,43 +1,26 @@
 
+function getSavedArticles(){const s=localStorage.getItem('awsj_custom_articles');if(s){try{return JSON.parse(s);}catch(e){}}return [];}
+function saveArticlesLocally(a){try{localStorage.setItem('awsj_custom_articles',JSON.stringify(a||[]));}catch(e){}}
+function getSavedPartners(){const s=localStorage.getItem('awsj_custom_partners');if(s){try{return JSON.parse(s);}catch(e){}}return [{id:1,name:'Escritório Esteves & Multi-Serviços',category:'Coordenação Editorial & Mentoria Científica',icon:'fas fa-award',website_url:'mailto:escritorioestevesemultisservic@gmail.com'}];}
+function savePartnersLocally(p){try{localStorage.setItem('awsj_custom_partners',JSON.stringify(p||[]));}catch(e){}}
+/**
+ * AfricaWinners Scientific Blog & Tech Hub (AWSJ) - Frontend Client Application
+ * Fundador & Mentor: Valdimir Jacinto Esteves
+ * Contacto: 976161521 | Email: escritorioestevesemultisservic@gmail.com
+ * Taxa de Publicação: $50 USD (com Certificado Oficial)
+ * Idiomas: Português 🇵🇹, Inglês 🇬🇧, Francês 🇫🇷
+ */
+
 // ==========================================================================
-// ARMAZENAMENTO PERSISTENTE & CONTROLO EDITORIAL ESTRITO (FIREBASE HOSTING)
+// ARMAZENAMENTO PERSISTENTE (FIREBASE HOSTING & OFFLINE-FIRST)
+// Garante que todas as publicações e alterações do Administrador NUNCA se apaguem
 // ==========================================================================
-
-function getDeletedArticleIds() {
-  try {
-    const raw = localStorage.getItem('awsj_deleted_article_ids');
-    if (raw) return new Set(JSON.parse(raw).map(String));
-  } catch (e) {}
-  return new Set();
-}
-
-function markArticleAsDeleted(articleId) {
-  if (!articleId) return;
-  const idStr = String(articleId);
-  const ids = getDeletedArticleIds();
-  ids.add(idStr);
-  try {
-    localStorage.setItem('awsj_deleted_article_ids', JSON.stringify([...ids]));
-  } catch (e) {}
-  if (db) {
-    try {
-      db.collection('deleted_articles').doc(idStr).set({
-        deletedAt: new Date().toISOString(),
-        id: idStr
-      });
-    } catch (e) {}
-  }
-}
-
 function getSavedArticles() {
   const saved = localStorage.getItem('awsj_custom_articles');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) {
-        const deletedIds = getDeletedArticleIds();
-        return parsed.filter(a => a && a.id && !deletedIds.has(String(a.id)));
-      }
+      if (Array.isArray(parsed)) return parsed;
     } catch(e) {}
   }
   return [];
@@ -45,9 +28,7 @@ function getSavedArticles() {
 
 function saveArticlesLocally(articles) {
   try {
-    const deletedIds = getDeletedArticleIds();
-    const clean = (articles || []).filter(a => a && a.id && !deletedIds.has(String(a.id)));
-    localStorage.setItem('awsj_custom_articles', JSON.stringify(clean));
+    localStorage.setItem('awsj_custom_articles', JSON.stringify(articles || []));
   } catch(e) {
     console.warn('Erro ao salvar artigos localmente:', e);
   }
@@ -113,12 +94,10 @@ async function saveArticleToCloud(article) {
 
 async function deleteArticleFromCloud(articleId) {
   if (!articleId) return;
-  const docId = String(articleId);
-  markArticleAsDeleted(docId);
   if (db) {
     try {
-      await db.collection('articles').doc(docId).delete();
-      console.log('🗑️ Artigo removido definitivamente do Cloud Firestore:', docId);
+      await db.collection('articles').doc(String(articleId)).delete();
+      console.log('🗑️ Artigo removido do Cloud Firestore:', articleId);
     } catch (err) {
       console.warn('Aviso ao remover do Firestore:', err);
     }
@@ -142,50 +121,22 @@ function initCloudSync() {
   }
 
   try {
-    // 1. Ouvinte para artigos excluídos (garante que itens apagados fiquem apagados em todos os aparelhos)
-    db.collection('deleted_articles').onSnapshot((snapshot) => {
-      const ids = getDeletedArticleIds();
-      let changed = false;
-      snapshot.forEach(doc => {
-        const dId = String(doc.id);
-        if (!ids.has(dId)) {
-          ids.add(dId);
-          changed = true;
-        }
-      });
-      if (changed) {
-        try {
-          localStorage.setItem('awsj_deleted_article_ids', JSON.stringify([...ids]));
-        } catch (e) {}
-        State.articles = (State.articles || []).filter(a => a && !ids.has(String(a.id)));
-        saveArticlesLocally(State.articles);
-        renderArticles();
-        loadAdminArticles();
-        fetchJournalStats();
-      }
-    }, () => {});
-
-    // 2. Ouvinte de publicações em tempo real
     db.collection('articles').onSnapshot((snapshot) => {
       const cloudArticles = [];
-      const deletedIds = getDeletedArticleIds();
-
       snapshot.forEach((doc) => {
         const item = doc.data();
         if (item) {
           if (!item.id) item.id = doc.id;
-          const idStr = String(item.id);
-          // Ignora estritamente qualquer publicação eliminada
-          if (!deletedIds.has(idStr)) {
-            cloudArticles.push(item);
-          }
+          cloudArticles.push(item);
         }
       });
 
-      cloudArticles.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
-      State.articles = cloudArticles;
-      saveArticlesLocally(State.articles);
-
+      if (cloudArticles.length > 0) {
+        cloudArticles.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+        State.articles = cloudArticles;
+        saveArticlesLocally(State.articles);
+      } else { State.articles = []; saveArticlesLocally([]); }
+      }
       renderArticles();
       loadAdminArticles();
       fetchJournalStats();
@@ -194,7 +145,6 @@ function initCloudSync() {
       renderArticles();
     });
 
-    // 3. Ouvinte de parceiros
     db.collection('partners').onSnapshot((snapshot) => {
       const cloudPartners = [];
       snapshot.forEach(doc => cloudPartners.push(doc.data()));
@@ -209,8 +159,543 @@ function initCloudSync() {
   }
 }
 
-// Zero artigos falsos ou não solicitados: apenas conteúdo real aprovado pelo Administrador
 const defaultArticlesData = [];
+
+const API_BASE = window.location.origin.includes('http') ? '' : 'http://localhost:3000';
+
+// ==========================================================================
+// DICIONÁRIO TRILINGUE (PORTUGUÊS 🇵🇹, INGLÊS 🇬🇧, FRANCÊS 🇫🇷)
+// ==========================================================================
+const I18N = {
+  pt: {
+    issnOnline: "ISSN 2959-1082 (Online)",
+    openAccessFee: "Acesso Aberto Comunitário • Blog & Tech Hub",
+    peerReview: "Mentoria & Revisão Acadêmica",
+    crossrefDoiMember: "Rumo a Revista Científica Internacional",
+    founderLabel: "Fundador & Mentor:",
+    navHome: "Início",
+    navPillars: "Pilares & Vozes",
+    navPartners: "Parceiros",
+    navArticles: "Blog & Artigos",
+    navLibrary: "A Biblioteca",
+    navAI: "Assistente IA",
+    navBringToLife: "Dê Vida",
+    navSubmit: "Submeter Artigo",
+    navTrack: "Acompanhar",
+    navFounder: "Mentor Valdimir",
+    navGuidelines: "Diretrizes",
+    navContact: "Contactos",
+    navAdmin: "Painel Admin",
+    btnSignIn: "Entrar",
+    btnRegister: "Registar",
+    heroKicker: "Iniciativa de Mentoria & Divulgação Científica em África",
+    heroTitleMain: "CADA COMUNIDADE TEM HISTÓRIAS & CIÊNCIA QUE MERECEM SER ETERNIZADAS.",
+    heroTitleGold: "AfricaWinners Scientific Blog & Tech Hub",
+    heroDesc: "Unimos mentoria científica sob a liderança do Fundador Valdimir Jacinto Esteves, tecnologia e divulgação comunitária para capacitar a nova geração de investigadores. Partilhe a sua actividade, projeto, artigo ou inovação com Certificado Oficial.",
+    btnHeroExplore: "Explorar Histórias & Artigos",
+    btnSubmitHero: "Submeter Artigo",
+    btnAIHero: "Assistente IA de Redação",
+    btnExploreHero: "Explorar Artigos do Blog",
+    btnGoogleHero: "Entrar com o Google",
+    btnWatchStory: "Ver Destaque",
+    featRigorous: "Mentoria Rigorosa",
+    featRigorousSub: "Valdimir Jacinto Esteves",
+    featDoi: "Tech Hub Comunitário",
+    featDoiSub: "Robótica, STEM & IA",
+    featCert: "Certificado Oficial",
+    featCertSub: "Com Reconhecimento Oficial",
+    heroMediaTitle: "Projeto Comunitário de Inovação & Robótica",
+    heroMediaDesc: "Capacitação Tecnológica das Novas Gerações em Angola",
+    feeBannerTitle: "Iniciativa Aberta Comunitária • Blog & Tech Hub",
+    feeBannerDesc: "Fomentamos a inovação e o talento científico em África com foco no impacto social e difusão do conhecimento. Cada artigo, atividade ou projeto aprovado conta com mentoria dedicada do Fundador Valdimir Jacinto Esteves e emissão de Certificado Oficial, evoluindo gradualmente para uma revista de alto calibre.",
+    statPub: "Artigos Publicados",
+    statEval: "Manuscritos em Mentoria",
+    statDown: "Downloads de PDFs",
+    statReads: "Leituras Globais",
+    secPillarsKicker: "Vozes da Comunidade & Inovação",
+    secPillarsTitle: "Comunidade & Impacto Científico",
+    secPillarsSub: "Preservando saberes, impulsionando líderes e divulgando a ciência e tecnologia feitas em África.",
+    pillar1Title: "Vozes Históricas & Científicas",
+    pillar1Desc: "Preserve memórias orais, descobertas pioneiras, saberes acadêmicos e patrimônio científico das comunidades antes que se percam.",
+    pillar2Title: "Vozes de Impacto Comunitário",
+    pillar2Desc: "Destaque pesquisadores, professores e líderes que transformam as suas regiões através da educação STEM, energias renováveis e saúde pública.",
+    pillar3Title: "Vozes da Nova Geração & Tech Hub",
+    pillar3Desc: "Dê visibilidade a jovens inventores, makers, startups de robótica e inteligência artificial que constroem soluções práticas para o continente.",
+    linkExplore: "Explorar Histórias",
+    linkParticipate: "Submeter Artigo",
+    linkPublishTech: "Publicar Inovação",
+    secPartnersKicker: "Rede de Colaboração Internacional",
+    secPartnersTitle: "Nossos Parceiros & Ecossistema",
+    secPartnersSub: "Trabalhamos com instituições e redes que acreditam no poder transformador da ciência e das vozes africanas.",
+    partnerDoi: "Inovação Aberta",
+    partnerDoiSub: "STEM & Comunidades Tech",
+    partnerUniv: "Universidades & Politécnicos",
+    partnerUnivSub: "Ensino Superior em África",
+    partnerSoc: "Sociedades Científicas",
+    partnerSocSub: "Pesquisa & Patrimônio",
+    partnerMun: "Municípios & Províncias",
+    partnerMunSub: "Inovação Comunitária",
+    partnerLib: "Bibliotecas & Museus",
+    partnerLibSub: "Preservação Histórica",
+    partnerDev: "Polos Tecnológicos & Robótica",
+    partnerDevSub: "STEM & Startups",
+    secArticlesKicker: "Histórias Sem Fronteiras & Produção Científica",
+    secArticlesTitle: "Artigos do Blog & Investigações",
+    secArticlesSub: "Durante anos, a AfricaWinners tem percorrido o continente recolhendo investigações de coragem, inovação, resiliência e transformação.",
+    filterAll: "Todas as Áreas",
+    filterCS: "Computação & IA",
+    filterEnergy: "Energias Renováveis",
+    filterBio: "Biotecnologia & Agro",
+    filterHealth: "Ciências da Saúde",
+    searchPlaceholder: "Pesquisar por título, autor ou palavra-chave...",
+    secLibraryKicker: "Recursos Acadêmicos & Modelos",
+    secLibraryTitle: "A Biblioteca AfricaWinners",
+    secLibrarySub: "Os artigos e histórias que partilhamos integram uma missão maior de capacitar autores a usar as suas vozes com autenticidade, coragem e rigor.",
+    libCard1Title: "Modelo Oficial de Artigo (.DOC)",
+    libCard1Desc: "Baixe o modelo formatado com cabeçalho internacional, estrutura IMRyD e normas para submissão imediata.",
+    libCard2Title: "Diretrizes & Submissão de Artigos",
+    libCard2Desc: "Orientações sobre a mentoria técnica, partilha aberta no Blog & Tech Hub e critérios para o Certificado Oficial.",
+    libCard3Title: "Rumo à Revista Internacional",
+    libCard3Desc: "Conheça o nosso roteiro de evolução gradual do Blog & Tech Hub rumo a uma revista científica indexada de alto calibre.",
+    libCard4Title: "Assistente IA de Redação",
+    libCard4Desc: "Use inteligência artificial avançada para estruturar o seu resumo, extrair palavras-chave e traduzir o manuscrito.",
+    btnReadGuide: "Diretrizes",
+    btnOpenAI: "Abrir IA",
+    secActionKicker: "Como Participar & Apoiar",
+    secActionTitle: "Dê Vida a Estas Vozes & Investigações",
+    secActionSub: "A AfricaWinners apoia-se em parceiros, mentores, investigadores e organizações que acreditam que cada voz científica tem valor.",
+    actCard1Title: "Seja um Parceiro da AfricaWinners",
+    actCard1Desc: "Representa uma universidade, escola, entidade financiadora ou plataforma interessada em colaboração? Procuramos parceiros que acreditam no poder transformador do conhecimento real. Vamos conversar.",
+    actCard2Title: "Junte-se à Rede de Mentoria",
+    actCard2Desc: "Esta iniciativa integra um movimento coordenado pelo Mentor Valdimir Jacinto Esteves para ajudar jovens investigadores a superar barreiras e publicar com excelência e autenticidade.",
+    actCard3Title: "Publique a Sua Investigação, Projeto Tech ou História de Vencedor",
+    actCard3Desc: "Partilhe as suas pesquisas, descobertas, protótipos de robótica ou a sua inspiradora história de vencedor com o continente. Submissão aberta com mentoria dedicada e Certificado Oficial chancelado pelo mentor.",
+    btnPartnerContact: "Falar com a Equipa",
+    btnMeetMentor: "Conhecer o Mentor",
+    btnSubmitCard: "Submeter Artigo ou História",
+    secSubmitKicker: "Submissão para Publicação & Mentoria",
+    secSubmitTitle: "Submeter Artigo, Projeto Tech ou História de Vencedor",
+    secSubmitSub: "Envie o seu artigo, actividade, relato de projeto ou história de superação e vitória para avaliação e mentoria técnica, com acompanhamento personalizado e emissão do Certificado Oficial.",
+    templateBannerTitle: "Modelo Oficial de Artigo (Template AWSJ)",
+    templateBannerDesc: "Descarregue o modelo estruturado nos formatos Word (.DOC) ou PDF com normas de tipografia e seções prontas para submissão.",
+    btnDownloadDoc: "Baixar Modelo (.DOC)",
+    btnDownloadPdf: "Baixar Modelo (.PDF)",
+    lblAuthorName: "Nome Completo do Autor Principal",
+    lblAuthorEmail: "E-mail Institucional / Académico",
+    lblInstitution: "Instituição de Ensino / Universidade",
+    lblPhone: "Contacto Telefónico / WhatsApp",
+    lblArticleTitle: "Título Completo do Artigo Científico",
+    lblAbstract: "Resumo Estruturado (Mínimo 150 palavras)",
+    lblField: "Área Científica",
+    lblKeywords: "Palavras-Chave (Separadas por vírgula)",
+    lblFile: "Ficheiro do Manuscrito (PDF ou DOCX - Máximo 30MB)",
+    dropzoneText: "Arraste e solte o ficheiro PDF aqui ou clique para selecionar",
+    dropzoneFormats: "Formatos: .PDF, .DOCX, .DOC (Limite de 30MB)",
+    declarationText: "Declaro que este trabalho é original e concordo com os termos de partilha e divulgação aberta no Blog & Tech Hub, com direito à emissão do Certificado Oficial de Publicação.",
+    btnSubmitForm: "Submeter Artigo",
+    secTrackKicker: "Acompanhamento de Artigos",
+    secTrackTitle: "Estado da Mentoria & Certificado",
+    secTrackSub: "Consulte o andamento do seu manuscrito e aceda ao seu Certificado Oficial de Publicação.",
+    trackPlaceholder: "Introduza o seu e-mail de autor...",
+    btnTrack: "Rastrear Submissão",
+    secFounderKicker: "Liderança & Coordenação Científica",
+    secFounderTitle: "Fundador & Mentor Científico",
+    secFounderSub: "Iniciativa voltada à soberania tecnológica e científica no continente africano.",
+    founderRole: "Fundador & Mentor Científico da AfricaWinners",
+    founderBio: "Dedicado ao fomento do ecossistema científico, tecnológico e acadêmico em África. Promotor de iniciativas de inclusão científica de base, capacitação tecnológica e mentoria de jovens investigadores.",
+    secContactKicker: "Canais de Comunicação",
+    secContactTitle: "Fale com Valdimir Jacinto Esteves & Equipa",
+    secContactSub: "Para propostas de parceria, apoio institucional, mentoria científica ou submissões de artigos.",
+    secGuideKicker: "Normas de Publicação",
+    secGuideTitle: "Diretrizes & Publicação Aberta",
+    secGuideSub: "Orientações sobre a estrutura de artigos, mentoria técnica e emissão de certificados.",
+    footerAbout: "Plataforma comunitária de inovação, tecnologia e blog científico focada na capacitação da juventude africana rumo a uma revista de alto calibre.",
+    footerFounderTitle: "Fundador & Mentor Científico:",
+    cookieTitle: "Este website utiliza cookies",
+    cookieText: "Utilizamos cookies para analisar o tráfego do website e otimizar a sua experiência. Ao aceitar o uso de cookies, os seus dados serão agregados aos de outros utilizadores para fins estatísticos e de melhoria contínua da plataforma científica.",
+    cookieDecline: "Recusar",
+    cookieAccept: "Aceitar",
+    navMediaKit: "Mídia Kit & Eventos",
+    secMediaKitKicker: "Parcerias Institucionais & Cobertura",
+    secMediaKitTitle: "Mídia Kit & Cobertura de Eventos Científicos & Tech",
+    secMediaKitSub: "Posicione a sua universidade, ministério ou empresa de tecnologia através da cobertura editorial oficial do AfricaWinners Blog & Tech Hub. Propostas comerciais personalizadas sob medida.",
+    mkPack1Badge: "DIVULGAÇÃO & REPORTAGEM",
+    mkPack1Title: "Pacote Cobertura Essencial",
+    mkPack1Desc: "Artigo pré-evento de ampla divulgação no blog, cobertura editorial e fotográfica durante a atividade, e publicação destacada das conclusões e momentos-chave no portal.",
+    mkPack2Badge: "MAIS PROCURADO • MULTIMÍDIA",
+    mkPack2Title: "Pacote Cobertura Premium & Whitepaper",
+    mkPack2Desc: "Tudo da cobertura essencial, acrescido de entrevistas exclusivas em vídeo/áudio com palestrantes e cientistas, elaboração de whitepaper técnico (relatório pós-evento) e chancela do Mentor Valdimir Jacinto Esteves.",
+    mkPack3Badge: "EMPRESAS & STARTUPS",
+    mkPack3Title: "Publieditoriais Tech & Inovação",
+    mkPack3Desc: "Publicação de artigos técnicos especializados demonstrando soluções de software, engenharia de ponta, telecomunicações e inovação corporativa no Tech Hub da AfricaWinners.",
+    mkPack4Badge: "CONVÊNIO ANUAL",
+    mkPack4Title: "Parceria Institucional de Mídia",
+    mkPack4Desc: "Acompanhamento contínuo de todas as jornadas científicas, semanas tecnológicas e feiras acadêmicas da sua instituição ao longo do ano, com ampla visibilidade digital e institucional.",
+    mkNoticeTitle: "Acordo Institucional & Proposta Sob Medida",
+    mkNoticeDesc: "Cada evento e parceria possui objetivos únicos. Não exibimos tarifas padronizadas no portal: todos os termos e propostas sob medida são alinhados diretamente via correspondência oficial por e-mail com a coordenação institucional.",
+    btnRequestProposal: "Solicitar Proposta por E-mail",
+    btnCallMentor: "Ligar (+244 976161521)",
+    lblContribType: "Finalidade da Submissão & Modalidade",
+    lblOrigJournal: "Revista ou Conferência de Origem",
+    lblOrigUrl: "Link / DOI do Artigo Original",
+    lblPubFormat: "Formato da Publicação",
+    lblPhotos: "Registos Fotográficos (Galeria de Imagens)",
+    lblVideo: "Registo em Vídeo (Demonstração, Entrevista ou Reportagem)"
+  },
+  en: {
+    issnOnline: "ISSN 2959-1082 (Online)",
+    openAccessFee: "Community Open Access • Blog & Tech Hub",
+    peerReview: "Academic Mentorship & Review",
+    crossrefDoiMember: "Advancing to an International Journal",
+    founderLabel: "Founder & Mentor:",
+    navHome: "Home",
+    navPillars: "Pillars & Voices",
+    navPartners: "Partners",
+    navArticles: "Blog & Articles",
+    navLibrary: "The Library",
+    navAI: "AI Assistant",
+    navBringToLife: "Bring to Life",
+    navSubmit: "Submit Article",
+    navTrack: "Track Paper",
+    navFounder: "Mentor Valdimir",
+    navGuidelines: "Guidelines",
+    navContact: "Contact",
+    navAdmin: "Admin Panel",
+    btnSignIn: "Sign In",
+    btnRegister: "Register",
+    heroKicker: "Iniciativa de Mentoria & Divulgação Científica em África",
+    heroTitleMain: "CADA COMUNIDADE TEM HISTÓRIAS & CIÊNCIA QUE MERECEM SER ETERNIZADAS.",
+    heroTitleGold: "AfricaWinners Scientific Blog & Tech Hub",
+    heroDesc: "Unimos mentoria científica sob a liderança do Fundador Valdimir Jacinto Esteves, tecnologia e divulgação comunitária para capacitar a nova geração de investigadores. Partilhe a sua actividade, projeto, artigo ou inovação com Certificado Oficial.",
+    btnHeroExplore: "Explore Stories & Papers",
+    btnSubmitHero: "Submit Article",
+    btnAIHero: "AI Scientific Assistant",
+    btnExploreHero: "Explore Blog Articles",
+    btnGoogleHero: "Sign in with Google",
+    btnWatchStory: "View Spotlight",
+    featRigorous: "Expert Mentorship",
+    featRigorousSub: "Valdimir Jacinto Esteves",
+    featDoi: "Community Tech Hub",
+    featDoiSub: "Robotics, STEM & AI",
+    featCert: "Official Certificate",
+    featCertSub: "Official Recognition",
+    heroMediaTitle: "Community Innovation & Robotics Project",
+    heroMediaDesc: "Grassroots Technological Empowerment in Angola",
+    feeBannerTitle: "Community Open Initiative • Blog & Tech Hub",
+    feeBannerDesc: "Fostering grassroots innovation and scientific talent across Africa with a focus on social impact and knowledge dissemination. Each approved paper receives dedicated mentorship under Founder Valdimir Jacinto Esteves and an Official Certificate, paving the way toward a premier international journal.",
+    statPub: "Published Papers",
+    statEval: "Papers in Mentorship",
+    statDown: "PDF Downloads",
+    statReads: "Global Reads",
+    secPillarsKicker: "Community Voices & Innovation",
+    secPillarsTitle: "Community & Scientific Impact",
+    secPillarsSub: "Preserving heritage, empowering leaders, and amplifying African science and technology.",
+    pillar1Title: "Historical & Scientific Voices",
+    pillar1Desc: "Preserve oral histories, pioneering breakthroughs, academic knowledge, and scientific heritage before they are lost.",
+    pillar2Title: "Voices of Community Impact",
+    pillar2Desc: "Spotlight researchers, educators, and leaders shaping their communities through STEM education, renewable energy, and public health.",
+    pillar3Title: "Next Generation & Tech Hub Voices",
+    pillar3Desc: "Give visibility to young inventors, makers, robotics startups, and AI creators building practical solutions for Africa.",
+    linkExplore: "Explore Stories",
+    linkParticipate: "Submit Paper",
+    linkPublishTech: "Publish Tech",
+    secPartnersKicker: "Global Collaboration Network",
+    secPartnersTitle: "Our Partners & Ecosystem",
+    secPartnersSub: "We collaborate with institutions and networks that believe in the transformative power of authentic knowledge.",
+    partnerDoi: "Open Innovation",
+    partnerDoiSub: "STEM & Tech Communities",
+    partnerUniv: "Universities & Polytechnics",
+    partnerUnivSub: "Higher Education in Africa",
+    partnerSoc: "Scientific Societies",
+    partnerSocSub: "Research & Heritage",
+    partnerMun: "Counties & Municipalities",
+    partnerMunSub: "Local Innovation",
+    partnerLib: "Libraries & Museums",
+    partnerLibSub: "Preservation & Memory",
+    partnerDev: "Tech Hubs & Robotics",
+    partnerDevSub: "STEM & Startups",
+    secArticlesKicker: "Scientific Output & Innovation",
+    secArticlesTitle: "Stories Beyond Borders & Blog Articles",
+    secArticlesSub: "For years, AfricaWinners has journeyed across the continent collecting investigations of courage, innovation, resilience, and transformation.",
+    filterAll: "All Fields",
+    filterCS: "Computer Science & AI",
+    filterEnergy: "Renewable Energy",
+    filterBio: "Biotechnology & Agro",
+    filterHealth: "Health Sciences",
+    searchPlaceholder: "Search by title, author, or keyword...",
+    secLibraryKicker: "Academic Resources & Templates",
+    secLibraryTitle: "The AfricaWinners Library",
+    secLibrarySub: "The papers and stories we share are part of a larger mission to help authors find confidence, overcome fear, and use their voices with courage.",
+    libCard1Title: "Official Paper Template (.DOC)",
+    libCard1Desc: "Download our structured template with international heading, IMRaD format, and author guidelines ready for submission.",
+    libCard2Title: "Guidelines & Submissions",
+    libCard2Desc: "Comprehensive guidelines on technical mentorship, open community sharing, and criteria for the Official Certificate.",
+    libCard3Title: "Roadmap to International Journal",
+    libCard3Desc: "Discover our phased roadmap as the Blog & Tech Hub evolves step-by-step into a high-caliber indexed scientific journal.",
+    libCard4Title: "AI Writing Assistant",
+    libCard4Desc: "Use state-of-the-art artificial intelligence to structure your abstract, extract keywords, and prepare trilingual manuscripts.",
+    btnReadGuide: "Guidelines",
+    btnOpenAI: "Open AI",
+    secActionKicker: "How to Engage & Support",
+    secActionTitle: "Bring These Stories to Life",
+    secActionSub: "AfricaWinners is powered by partners, mentors, researchers, and community organizations who believe every voice matters.",
+    actCard1Title: "Partner with AfricaWinners",
+    actCard1Desc: "Are you part of an academic institution, funder, or media platform interested in collaboration? We seek aligned partners who believe in real knowledge. Let's talk.",
+    actCard2Title: "Join the Mentorship Alliance",
+    actCard2Desc: "This initiative is part of a movement led by Mentor Valdimir Jacinto Esteves dedicated to empowering young minds to speak up with scientific courage.",
+    actCard3Title: "Publish Your Research, Tech Project or Winner Story",
+    actCard3Desc: "Share your findings, robotics breakthroughs, or inspiring winner story with the continent. Open submission with technical mentorship and an Official Certificate.",
+    btnPartnerContact: "Talk with the Team",
+    btnMeetMentor: "Meet the Mentor",
+    btnSubmitCard: "Submit Paper or Story",
+    secSubmitKicker: "Submission for Mentorship & Publishing",
+    secSubmitTitle: "Submit Paper, Tech Project or Winner Story",
+    secSubmitSub: "Submit your original paper, activity, project report, or inspiring winner story for evaluation and mentorship, with dedicated guidance and an Official Certificate.",
+    templateBannerTitle: "Official Article Template (AWSJ)",
+    templateBannerDesc: "Download the structured AWSJ template in Word (.DOC) or PDF format with standard academic typography and sections.",
+    btnDownloadDoc: "Download Template (.DOC)",
+    btnDownloadPdf: "Download Template (.PDF)",
+    lblAuthorName: "Lead Author's Full Name",
+    lblAuthorEmail: "Institutional / Academic Email",
+    lblInstitution: "University / Research Center",
+    lblPhone: "Phone / WhatsApp Contact",
+    lblArticleTitle: "Full Scientific Article Title",
+    lblAbstract: "Structured Abstract (Minimum 150 words)",
+    lblField: "Scientific Field",
+    lblKeywords: "Keywords (Comma separated)",
+    lblFile: "Manuscript File (PDF or DOCX - Max 30MB)",
+    dropzoneText: "Drag and drop your manuscript file here or click to browse",
+    dropzoneFormats: "Supported formats: .PDF, .DOCX, .DOC (30MB limit)",
+    declarationText: "I declare that this work is original and agree to the open dissemination terms of the Blog & Tech Hub, including issuance of the Official Certificate.",
+    btnSubmitForm: "Submit Article",
+    secTrackKicker: "Submission Tracker",
+    secTrackTitle: "Mentorship & Certificate Status",
+    secTrackSub: "Check your paper's review progress and access your Official Certificate of Publication.",
+    trackPlaceholder: "Enter your author email...",
+    btnTrack: "Track Submission",
+    secFounderKicker: "Leadership & Scientific Coordination",
+    secFounderTitle: "Founder & Scientific Mentor",
+    secFounderSub: "Dedicated to technological sovereignty and grassroots innovation across Africa.",
+    founderRole: "Founder & Scientific Mentor of AfricaWinners",
+    founderBio: "Committed to fostering the scientific and technological ecosystem across Africa. Champion of grassroots STEM inclusion, capacity-building, and mentoring emerging researchers.",
+    secContactKicker: "Communication Channels",
+    secContactTitle: "Get in Touch with Valdimir & Team",
+    secContactSub: "For partnership proposals, institutional support, academic mentorship, or submissions.",
+    secGuideKicker: "Publishing Guidelines",
+    secGuideTitle: "Publishing Guidelines & Open Model",
+    secGuideSub: "Guidance on article structuring, technical mentorship, and certificate validation.",
+    footerAbout: "Community innovation platform and scientific blog empowering African youth on its path to an international journal.",
+    footerFounderTitle: "Founder & Scientific Mentor:",
+    cookieTitle: "This website uses cookies",
+    cookieText: "We use cookies to analyze website traffic and optimize your website experience. By accepting our use of cookies, your data will be aggregated with all other user data for platform improvement.",
+    cookieDecline: "Decline",
+    cookieAccept: "Accept",
+    navMediaKit: "Media Kit & Events",
+    secMediaKitKicker: "Institutional Partnerships & Coverage",
+    secMediaKitTitle: "Media Kit & Scientific/Tech Event Coverage",
+    secMediaKitSub: "Position your university, ministry, or tech company with official editorial coverage from the AfricaWinners Blog & Tech Hub. Tailored institutional proposals upon request.",
+    mkPack1Badge: "PROMOTION & REPORTING",
+    mkPack1Title: "Essential Coverage Package",
+    mkPack1Desc: "Pre-event promotional article on our blog, editorial and photojournalism coverage during the event, and highlighted publication of key takeaways on the portal.",
+    mkPack2Badge: "MOST POPULAR • MULTIMEDIA",
+    mkPack2Title: "Premium Coverage & Whitepaper Package",
+    mkPack2Desc: "All essential coverage features, plus exclusive video/audio interviews with keynote speakers and scientists, an official technical whitepaper summarizing scientific conclusions, and endorsement by Mentor Valdimir Jacinto Esteves.",
+    mkPack3Badge: "COMPANIES & STARTUPS",
+    mkPack3Title: "Tech Sponsored Articles & Showcases",
+    mkPack3Desc: "Specialized technical publication showcasing enterprise software solutions, cutting-edge engineering, and corporate innovation within the AfricaWinners Tech Hub.",
+    mkPack4Badge: "ANNUAL AGREEMENT",
+    mkPack4Title: "Institutional Media Partnership",
+    mkPack4Desc: "Ongoing editorial coverage for all scientific conferences, tech weeks, and academic fairs of your institution throughout the year, with wide digital reach.",
+    mkNoticeTitle: "Tailored Proposals & Institutional Agreements",
+    mkNoticeDesc: "Every event and partnership is unique. We do not display fixed price tags: all tailored proposals and terms are agreed upon directly via official email correspondence.",
+    btnRequestProposal: "Request Proposal via Email",
+    btnCallMentor: "Call (+244 976161521)",
+    lblContribType: "Purpose of Submission & Category",
+    lblOrigJournal: "Original Journal or Conference",
+    lblOrigUrl: "Original Link / DOI",
+    lblPubFormat: "Publication Format",
+    lblPhotos: "Photographic Records (Image Gallery)",
+    lblVideo: "Video Record (Demonstration, Interview or Report)"
+  },
+  fr: {
+    issnOnline: "ISSN 2959-1082 (En ligne)",
+    openAccessFee: "Accès Ouvert Communautaire • Blog & Tech Hub",
+    peerReview: "Mentorat & Évaluation Scientifique",
+    crossrefDoiMember: "Vers une Revue Scientifique Internationale",
+    founderLabel: "Fondateur & Mentor:",
+    navHome: "Accueil",
+    navPillars: "Piliers & Voix",
+    navPartners: "Partenaires",
+    navArticles: "Blog & Articles",
+    navLibrary: "La Bibliothèque",
+    navAI: "Assistant IA",
+    navBringToLife: "Donnez Vie",
+    navSubmit: "Soumettre un Article",
+    navTrack: "Suivi",
+    navFounder: "Mentor Valdimir",
+    navGuidelines: "Directives",
+    navContact: "Contacts",
+    navAdmin: "Panneau Admin",
+    btnSignIn: "Connexion",
+    btnRegister: "S'inscrire",
+    heroKicker: "Iniciativa de Mentoria & Divulgação Científica em África",
+    heroTitleMain: "CADA COMUNIDADE TEM HISTÓRIAS & CIÊNCIA QUE MERECEM SER ETERNIZADAS.",
+    heroTitleGold: "AfricaWinners Scientific Blog & Tech Hub",
+    heroDesc: "Unimos mentoria científica sob a liderança do Fundador Valdimir Jacinto Esteves, tecnologia e divulgação comunitária para capacitar a nova geração de investigadores. Partilhe a sua actividade, projeto, artigo ou inovação com Certificado Oficial.",
+    btnHeroExplore: "Explorer les Histoires & Articles",
+    btnSubmitHero: "Soumettre un Article",
+    btnAIHero: "Assistant IA Scientifique",
+    btnExploreHero: "Explorer les Articles du Blog",
+    btnGoogleHero: "Se connecter avec Google",
+    btnWatchStory: "Voir En Vedette",
+    featRigorous: "Mentorat Rigoureux",
+    featRigorousSub: "Valdimir Jacinto Esteves",
+    featDoi: "Pôle Technologique",
+    featDoiSub: "Robotique, STEM & IA",
+    featCert: "Certificat Officiel",
+    featCertSub: "Reconnaissance Officielle",
+    heroMediaTitle: "Projet Communautaire de Robotique & Innovation",
+    heroMediaDesc: "Autonomisation Technologique de la Jeunesse en Angola",
+    feeBannerTitle: "Initiative Ouverte Communautaire • Blog & Pôle Tech",
+    feeBannerDesc: "Encourager l'innovation et le talent scientifique en Afrique axé sur l'impact social et le rayonnement. Chaque article bénéficie du mentorat dédié du Fondateur Valdimir Jacinto Esteves et d'un Certificat Officiel, évoluant progressivement vers une revue de haut niveau.",
+    statPub: "Articles Publiés",
+    statEval: "Manuscrits en Mentorat",
+    statDown: "Téléchargements PDF",
+    statReads: "Lectures Globales",
+    secPillarsKicker: "Voix de la Communauté & Innovation",
+    secPillarsTitle: "Communauté & Impact Scientifique",
+    secPillarsSub: "Préserver les savoirs, soutenir les leaders et faire rayonner la science et la technologie en Afrique.",
+    pillar1Title: "Voix Historiques & Scientifiques",
+    pillar1Desc: "Préservez les mémoires orales, les découvertes pionnières et le patrimoine scientifique des communautés avant qu'ils ne disparaissent.",
+    pillar2Title: "Voix d'Impact Communautaire",
+    pillar2Desc: "Mettez en lumière les chercheurs et éducateurs qui transforment leur région par l'éducation STEM, les énergies renouvelables et la santé.",
+    pillar3Title: "Voix de la Nouvelle Génération",
+    pillar3Desc: "Donnez de la visibilité aux jeunes créateurs, makers et startups de robotique et d'IA qui conçoivent des solutions africaines.",
+    linkExplore: "Explorer",
+    linkParticipate: "Soumettre",
+    linkPublishTech: "Publier l'Innovation",
+    secPartnersKicker: "Réseau de Collaboration Internationale",
+    secPartnersTitle: "Nos Partenaires & Écosystème",
+    secPartnersSub: "Nous collaborons avec des institutions qui croient au pouvoir transformateur de la science et des voix africaines.",
+    partnerDoi: "Innovation Ouverte",
+    partnerDoiSub: "STEM & Communautés Tech",
+    partnerUniv: "Universités & Instituts",
+    partnerUnivSub: "Enseignement Supérieur",
+    partnerSoc: "Sociétés Scientifiques",
+    partnerSocSub: "Recherche & Patrimoine",
+    partnerMun: "Municipalités & Régions",
+    partnerMunSub: "Innovation Locale",
+    partnerLib: "Bibliothèques & Musées",
+    partnerLibSub: "Mémoire & Conservation",
+    partnerDev: "Pôles Technologiques & Robotique",
+    partnerDevSub: "STEM & Startups",
+    secArticlesKicker: "Production Scientifique & Innovation",
+    secArticlesTitle: "Histoires Sans Frontières & Articles du Blog",
+    secArticlesSub: "Depuis des années, AfricaWinners parcourt le continent pour recueillir des travaux de recherche marqués par le courage, l'innovation et la résilience.",
+    filterAll: "Tous les Domaines",
+    filterCS: "Informatique & IA",
+    filterEnergy: "Énergies Renouvelables",
+    filterBio: "Biotechnologie & Agro",
+    filterHealth: "Sciences de la Santé",
+    searchPlaceholder: "Rechercher par titre, auteur ou mot-clé...",
+    secLibraryKicker: "Ressources Académiques & Modèles",
+    secLibraryTitle: "La Bibliothèque AfricaWinners",
+    secLibrarySub: "Les articles et récits que nous partageons font partie d'une mission plus vaste visant à encourager les auteurs à s'exprimer avec courage.",
+    libCard1Title: "Modèle Officiel d'Article (.DOC)",
+    libCard1Desc: "Téléchargez le modèle avec en-tête officiel, structure IMRaD et directives prêt pour la soumission immédiate.",
+    libCard2Title: "Directives & Soumissions",
+    libCard2Desc: "Instructions complètes sur le mentorat technique, la publication ouverte et les critères d'obtention du Certificat Officiel.",
+    libCard3Title: "Vers une Revue Internationale",
+    libCard3Desc: "Découvrez notre feuille de route alors que le Blog & Tech Hub évolue par étapes vers une revue scientifique indexée de haut niveau.",
+    libCard4Title: "Assistant IA de Rédaction",
+    libCard4Desc: "Utilisez l'intelligence artificielle pour structurer votre résumé, générer des mots-clés et traduire vos travaux.",
+    btnReadGuide: "Directives",
+    btnOpenAI: "Ouvrir l'IA",
+    secActionKicker: "Comment Participer & Soutenir",
+    secActionTitle: "Donnez Vie à Ces Voix & Recherches",
+    secActionSub: "AfricaWinners est soutenu par des partenaires, des mentors et des institutions convaincus que chaque voix compte.",
+    actCard1Title: "Devenez Partenaire d'AfricaWinners",
+    actCard1Desc: "Représentez-vous une université, un bailleur de fonds ou un média? Nous recherchons des partenaires alignés. Échangeons ensemble.",
+    actCard2Title: "Rejoignez le Réseau de Mentorat",
+    actCard2Desc: "Cette initiative fait partie d'un mouvement dirigé par le Mentor Valdimir Jacinto Esteves pour aider les jeunes chercheurs à s'affirmer.",
+    actCard3Title: "Publiez Votre Recherche, Projet Tech ou Histoire de Vainqueur",
+    actCard3Desc: "Partagez vos recherches, prototypes robotiques ou votre inspirante histoire de vainqueur avec le continent. Soumission ouverte avec mentorat et Certificat Officiel.",
+    btnPartnerContact: "Contacter l'Équipe",
+    btnMeetMentor: "Découvrir le Mentor",
+    btnSubmitCard: "Soumettre un Article ou Récit",
+    secSubmitKicker: "Soumission pour Mentorat & Publication",
+    secSubmitTitle: "Soumettre un Article, Projet Tech ou Histoire de Vainqueur",
+    secSubmitSub: "Envoyez votre article, activité, projet ou histoire inspirante de réussite et victoire pour évaluation et mentorat, avec accompagnement personnalisé et un Certificat Officiel.",
+    templateBannerTitle: "Modèle Officiel d'Article (AWSJ)",
+    templateBannerDesc: "Téléchargez le modèle structuré au format Word (.DOC) ou PDF prêt pour la soumission académique.",
+    btnDownloadDoc: "Télécharger Modèle (.DOC)",
+    btnDownloadPdf: "Télécharger Modèle (.PDF)",
+    lblAuthorName: "Nom Complet de l'Auteur Principal",
+    lblAuthorEmail: "E-mail Institutionnel / Académique",
+    lblInstitution: "Université / Centre de Recherche",
+    lblPhone: "Téléphone / WhatsApp",
+    lblArticleTitle: "Titre Complet de l'Article Scientifique",
+    lblAbstract: "Résumé Structuré (Minimum 150 mots)",
+    lblField: "Domaine Scientifique",
+    lblKeywords: "Mots-clés (Séparés par des virgules)",
+    lblFile: "Fichier du Manuscruit (PDF ou DOCX - Max 30MB)",
+    dropzoneText: "Glissez et déposez votre fichier ici ou cliquez pour choisir",
+    dropzoneFormats: "Formats acceptés: .PDF, .DOCX, .DOC (Limite 30MB)",
+    declarationText: "Je déclare que ce travail est original et j'accepte les conditions de diffusion ouverte du Blog & Tech Hub, incluant l'émission du Certificat Officiel.",
+    btnSubmitForm: "Soumettre un Article",
+    secTrackKicker: "Suivi des Soumissions",
+    secTrackTitle: "État du Mentorat & Certificat",
+    secTrackSub: "Consultez l'avancement de votre manuscrit et accédez à votre Certificat Officiel de Publication.",
+    trackPlaceholder: "Entrez votre e-mail d'auteur...",
+    btnTrack: "Suivre la Soumission",
+    secFounderKicker: "Gouvernance & Mentorat Scientifique",
+    secFounderTitle: "Fondateur & Mentor Scientifique",
+    secFounderSub: "Une initiative dédiée à la souveraineté technologique et au desenvolvimento en Afrique.",
+    founderRole: "Fondateur & Mentor Scientifique d'AfricaWinners",
+    founderBio: "Dédié au renforcement de l'écosystème scientifique et technologique en Afrique. Promoteur de l'éducation scientifique dès la base et du mentorat des jeunes chercheurs.",
+    secContactKicker: "Canaux de Communication",
+    secContactTitle: "Contactez Valdimir & l'Équipe",
+    secContactSub: "Pour les propositions de partenariat, le soutien institutionnel ou les soumissions d'articles.",
+    secGuideKicker: "Normes de Publication",
+    secGuideTitle: "Directives & Modèle Ouvert",
+    secGuideSub: "Orientations sur la structure des articles, le mentorat technique et la certification.",
+    footerAbout: "Plateforme communautaire d'innovation et blog scientifique pour la jeunesse africaine vers une revue de haut niveau.",
+    footerFounderTitle: "Fondateur & Mentor Scientifique:",
+    cookieTitle: "Ce site utilise des cookies",
+    cookieText: "Nous utilisons des cookies pour analyser le trafic et optimiser votre expérience. En acceptant, vos données contribuent à l'amélioration de notre plateforme.",
+    cookieDecline: "Refuser",
+    cookieAccept: "Accepter",
+    navMediaKit: "Kit Média & Événements",
+    secMediaKitKicker: "Partenariats Institutionnels & Couverture",
+    secMediaKitTitle: "Kit Média & Couverture d'Événements Scientifiques & Tech",
+    secMediaKitSub: "Positionnez votre université, ministère ou entreprise technologique grâce à la couverture éditoriale officielle d'AfricaWinners Blog & Tech Hub. Propositions sur mesure.",
+    mkPack1Badge: "DIFFUSION & REPORTAGE",
+    mkPack1Title: "Forfait Couverture Essentielle",
+    mkPack1Desc: "Article pré-événement de large diffusion sur le blog, couverture éditoriale et photographique pendant l'activité, et publication des faits saillants sur le portail.",
+    mkPack2Badge: "LE PLUS DEMANDÉ • MULTIMÉDIA",
+    mkPack2Title: "Forfait Couverture Premium & Whitepaper",
+    mkPack2Desc: "Tout le forfait essentiel, plus des interviews vidéo/audio exclusives avec des conférenciers, un livre blanc technique (rapport scientifique post-événement) et le parrainage du Mentor Valdimir Jacinto Esteves.",
+    mkPack3Badge: "ENTREPRISES & STARTUPS",
+    mkPack3Title: "Publireportages Tech & Innovation",
+    mkPack3Desc: "Publication d'articles techniques démontrant des solutions logicielles d'entreprise, ingénierie de pointe et innovation au sein du Tech Hub d'AfricaWinners.",
+    mkPack4Badge: "ACCORD ANNUEL",
+    mkPack4Title: "Partenariat Média Institutionnel",
+    mkPack4Desc: "Suivi éditorial continu de toutes les journées scientifiques, semaines technologiques et salons académiques de votre institution tout au long de l'année.",
+    mkNoticeTitle: "Accord Institutionnel & Proposition Sur Mesure",
+    mkNoticeDesc: "Chaque événement et partenariat est unique. Nous n'affichons aucun tarif standard sur le portail: tous les termes sont convenus directement par correspondance officielle par courriel.",
+    btnRequestProposal: "Demander une Proposition par E-mail",
+    btnCallMentor: "Appeler (+244 976161521)",
+    lblContribType: "Finalité de la Soumission & Catégorie",
+    lblOrigJournal: "Revue ou Conférence d'Origine",
+    lblOrigUrl: "Lien / DOI d'Origine",
+    lblPubFormat: "Format de Publication",
+    lblPhotos: "Registres Photographiques (Galerie d'Images)",
+    lblVideo: "Enregistrement Vidéo (Démonstration, Interview ou Reportage)"
+  }
+};
+
+// Artigos Iniciais Padrão (Exemplificando os 4 Formatos: Artigo, História, Actividade e Projecto)
+// const defaultArticlesData = []; // Removido duplicado
 
 const defaultPartnersData = [
   { id: 3, name: 'Sociedades Científicas Africanas', category: 'Pesquisa & Patrimônio Acadêmico', icon: 'fas fa-book-reader', website_url: '#' },
@@ -1125,11 +1610,10 @@ function lockAdminDashboard() {
   showToast('Painel do Administrador bloqueado com segurança.', 'info');
 }
 
-
 function openEditArticleModal(artId) {
   const art = (State.articles || []).find(a => String(a.id) === String(artId));
   if (!art) {
-    showToast('Publicação não encontrada para edição.', 'error');
+    showToast('Publicacao nao encontrada para edicao.', 'error');
     return;
   }
   const form = document.getElementById('adminEditArticleForm');
@@ -1156,7 +1640,7 @@ async function handleAdminEditArticleSubmit(e) {
 
   const art = (State.articles || []).find(a => String(a.id) === String(artId));
   if (!art) {
-    showToast('Publicação não encontrada.', 'error');
+    showToast('Publicacao nao encontrada.', 'error');
     return;
   }
 
@@ -1185,11 +1669,11 @@ async function handleAdminEditArticleSubmit(e) {
   loadAdminArticles();
   fetchJournalStats();
 
-  showToast('Publicação atualizada e salva na nuvem com sucesso!', 'success');
+  showToast('Publicacao atualizada e salva na nuvem com sucesso!', 'success');
 
   if (submitBtn) {
     submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Alterações';
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Alteracoes';
   }
 }
 
@@ -1367,6 +1851,8 @@ async function quickPublishArticle(articleId) {
 
   if (art) {
     art.status = 'Published';
+    saveArticlesLocally(State.articles);
+    await saveArticleToCloud(art);
   }
   showToast(isArticle
     ? `Artigo #${articleId} publicado com sucesso! Certificado Oficial emitido.`
@@ -1398,13 +1884,9 @@ async function quickPublishArticle(articleId) {
 }
 
 async function deleteArticle(articleId) {
-  if (!articleId) return;
-  const idStr = String(articleId);
-  const art = (State.articles || []).find(a => String(a.id) === idStr);
-  const title = art ? art.title : `Publicação #${articleId}`;
-  if (!confirm(`Tem a certeza que deseja eliminar permanentemente a publicação #${articleId} ("${title}")?
-
-Esta publicação será excluída definitivamente da nuvem e NUNCA mais voltará a aparecer.`)) {
+  const art = (State.articles || []).find(a => String(a.id) === String(articleId));
+  const title = art ? art.title : `Artigo #${articleId}`;
+  if (!confirm(`Tem a certeza que deseja eliminar permanentemente o Artigo #${articleId} ("${title}")? Esta solicitação será removida de todo o sistema.`)) {
     return;
   }
 
@@ -1412,17 +1894,12 @@ Esta publicação será excluída definitivamente da nuvem e NUNCA mais voltará
   document.getElementById(`admin-article-row-${articleId}`)?.remove();
   document.getElementById(`artigo-${articleId}`)?.remove();
 
-  // 2. Registra na lista permanente de eliminados (Cloud Firestore + LocalStorage)
-  markArticleAsDeleted(idStr);
-
-  // 3. Remove do Estado Global e salva localmente
-  State.articles = (State.articles || []).filter(a => String(a.id) !== idStr);
+  // 2. Remove do Estado Global
+  State.articles = State.articles.filter(a => String(a.id) !== String(articleId));
   saveArticlesLocally(State.articles);
+  await deleteArticleFromCloud(articleId);
 
-  // 4. Remove definitivamente do Cloud Firestore
-  await deleteArticleFromCloud(idStr);
-
-  // 5. Atualiza contadores visuais
+  // 3. Atualiza contadores visuais
   const countTotal = document.getElementById('adminCountTotal');
   if (countTotal) countTotal.innerText = State.articles.length;
   const countPublished = document.getElementById('adminCountPublished');
@@ -1435,40 +1912,46 @@ Esta publicação será excluída definitivamente da nuvem e NUNCA mais voltará
   const statSub = document.getElementById('statSubmissions');
   if (statSub) statSub.innerText = State.articles.length;
 
-  // 6. Feedback imediato ao utilizador
-  showToast(`Publicação #${articleId} eliminada permanentemente da nuvem!`, 'info');
+  // 4. Feedback imediato ao utilizador
+  showToast(`Artigo #${articleId} eliminado com sucesso de todo o portal!`, 'info');
 
-  // 7. Re-renderiza o blog se estiver no ecrã
+  // 5. Re-renderiza o blog se estiver no ecrã
   renderArticles();
-  loadAdminArticles();
-  fetchJournalStats();
+
+  // Se a tabela do admin ficou vazia, mostra mensagem
+  const tableBody = document.getElementById('adminTableBody');
+  if (tableBody && State.articles.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Nenhum artigo ou solicitação recebida ainda.</td></tr>`;
+  }
+
+  // 6. Envia pedido DELETE para a API do backend
+  try {
+    await fetch(`${API_BASE}/api/admin/articles/${articleId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${State.token}`
+      }
+    });
+  } catch (err) {
+    // Já eliminado na interface
+  }
 }
 
+// Manipular Publicação Direta do Administrador
 async function purgeUnwantedArticles() {
-  if (!confirm('Deseja eliminar todas as publicações não aprovadas ou artigos de demonstração anteriores (IDs 1, 2, 3, 4)?
-
-Apenas as publicações reais aprovadas pelo administrador serão mantidas.')) {
-    return;
-  }
+  if (!confirm("Deseja eliminar todas as publicacoes nao aprovadas ou artigos de demonstracao anteriores? Apenas publicacoes aprovadas serao mantidas.")) return;
   const toDelete = (State.articles || []).filter(a => ['1','2','3','4'].includes(String(a.id)) || a.status !== 'Published');
-  if (toDelete.length === 0) {
-    showToast('Não há publicações de demonstração ou não aprovadas para limpar.', 'info');
-    return;
-  }
   for (const art of toDelete) {
-    const idStr = String(art.id);
-    markArticleAsDeleted(idStr);
-    await deleteArticleFromCloud(idStr);
-    State.articles = (State.articles || []).filter(a => String(a.id) !== idStr);
+    await deleteArticleFromCloud(art.id);
+    State.articles = (State.articles || []).filter(a => String(a.id) !== String(art.id));
   }
   saveArticlesLocally(State.articles);
   renderArticles();
   loadAdminArticles();
   fetchJournalStats();
-  showToast(`Limpeza concluída! ${toDelete.length} publicação(ões) eliminada(s) com sucesso da nuvem.`, 'success');
+  showToast('Limpeza concluida com sucesso!', 'success');
 }
 
-// Manipular Publicação Direta do Administrador
 async function handleAdminDirectPublish(e) {
   e.preventDefault();
   const form = e.target;
@@ -1998,23 +2481,7 @@ async function fetchArticles() {
   }
 }
 
-function renderArticles() {
-  const grid = document.getElementById('articlesGrid');
-  if (!grid) return;
-
-  const deletedIds = getDeletedArticleIds();
-
-  const filtered = (State.articles || []).filter(art => {
-    if (!art || !art.id) return false;
-
-    // ELIMINAÇÃO ESTRITA: se foi eliminado pelo administrador, NUNCA exibe
-    if (deletedIds.has(String(art.id))) return false;
-
-    // REGRA DE OURO: Apenas publicações APROVADAS pelo administrador aparecem na área pública do Blog!
-    // Artigos em 'Under Peer Review', 'Submitted', 'Revisões Solicitadas' ou 'Rejected'
-    // só aparecem no Painel Editorial do Administrador para revisão!
-    if (art.status !== 'Published') return false;
-
+function renderArticles() { const grid = document.getElementById('articlesGrid'); if (!grid) return; const filtered = (State.articles || []).filter(art => { if (art.status !== 'Published') return false;
     // 1. Filtro por Área Temática
     const matchesField = State.activeField === 'all' || art.field === State.activeField;
 
@@ -2032,9 +2499,9 @@ function renderArticles() {
 
     // 3. Pesquisa textual
     const matchesSearch = !State.searchQuery ||
-      (art.title && art.title.toLowerCase().includes(State.searchQuery)) ||
-      (art.abstract && art.abstract.toLowerCase().includes(State.searchQuery)) ||
-      (art.author_name && art.author_name.toLowerCase().includes(State.searchQuery)) ||
+      art.title.toLowerCase().includes(State.searchQuery) ||
+      art.abstract.toLowerCase().includes(State.searchQuery) ||
+      art.author_name.toLowerCase().includes(State.searchQuery) ||
       (art.doi && art.doi.toLowerCase().includes(State.searchQuery)) ||
       (art.keywords && art.keywords.toLowerCase().includes(State.searchQuery));
 
@@ -2044,15 +2511,15 @@ function renderArticles() {
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--gold-border);">
-        <i class="fas fa-feather-alt" style="font-size: 2.5rem; color: var(--gold-primary); margin-bottom: 1rem;"></i>
-        <h4 style="color:#ffffff; margin-bottom:0.5rem;">Nenhuma publicação aprovada no momento</h4>
-        <p style="color:var(--text-muted); font-size:0.9rem;">Todas as publicações e submissões são validadas pela Direção Editorial antes de serem divulgadas no portal.</p>
+        <i class="fas fa-search" style="font-size: 2.5rem; color: var(--gold-primary); margin-bottom: 1rem;"></i>
+        <h4 style="color:#ffffff; margin-bottom:0.5rem;">Nenhuma publicação encontrada</h4>
+        <p style="color:var(--text-muted); font-size:0.9rem;">Tente ajustar os filtros de formato ou termos de pesquisa.</p>
       </div>
     `;
     return;
   }
 
-  grid.innerHTML = filtered.mapgrid.innerHTML = filtered.map(art => {
+  grid.innerHTML = filtered.map(art => {
     const rawType = art.publication_type || art.contribution_type || 'Artigo Científico';
     let typeClass = 'badge-pub-artigo';
     let typeIcon = 'fas fa-file-alt';
