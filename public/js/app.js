@@ -1610,73 +1610,6 @@ function lockAdminDashboard() {
   showToast('Painel do Administrador bloqueado com segurança.', 'info');
 }
 
-function openEditArticleModal(artId) {
-  const art = (State.articles || []).find(a => String(a.id) === String(artId));
-  if (!art) {
-    showToast('Publicacao nao encontrada para edicao.', 'error');
-    return;
-  }
-  const form = document.getElementById('adminEditArticleForm');
-  if (!form) return;
-
-  document.getElementById('editArticleId').value = art.id;
-  document.getElementById('editArticleTitle').value = art.title || '';
-  document.getElementById('editArticleField').value = art.field || 'Sistemas & IA';
-  document.getElementById('editArticleStatus').value = art.status || 'Published';
-  document.getElementById('editArticleAuthor').value = art.author_name || '';
-  document.getElementById('editArticleInstitution').value = art.institution || '';
-  document.getElementById('editArticleKeywords').value = art.keywords || '';
-  document.getElementById('editArticleAbstract').value = art.abstract || '';
-  document.getElementById('editArticleVideo').value = art.video_url || '';
-
-  openModal('adminEditArticleModal');
-}
-
-async function handleAdminEditArticleSubmit(e) {
-  e.preventDefault();
-  const form = e.target;
-  const artId = form.editArticleId.value;
-  const submitBtn = document.getElementById('btnSaveEditArticle');
-
-  const art = (State.articles || []).find(a => String(a.id) === String(artId));
-  if (!art) {
-    showToast('Publicacao nao encontrada.', 'error');
-    return;
-  }
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A guardar...';
-  }
-
-  art.title = form.title.value.trim();
-  art.field = form.field.value;
-  art.status = form.status.value;
-  art.author_name = form.author_name.value.trim();
-  art.institution = form.institution.value.trim();
-  art.keywords = form.keywords.value.trim();
-  art.abstract = form.abstract.value.trim();
-  art.video_url = form.video_url ? form.video_url.value.trim() : '';
-  art.updated_at = new Date().toISOString();
-
-  saveArticlesLocally(State.articles);
-  await saveArticleToCloud(art);
-
-  closeAllModals();
-  openModal('adminModal');
-  switchAdminTab('articles');
-  renderArticles();
-  loadAdminArticles();
-  fetchJournalStats();
-
-  showToast('Publicacao atualizada e salva na nuvem com sucesso!', 'success');
-
-  if (submitBtn) {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Alteracoes';
-  }
-}
-
 function renderAdminArticlesList(articles, container) {
   if (!container) return;
   if (!articles || articles.length === 0) {
@@ -1939,7 +1872,6 @@ async function deleteArticle(articleId) {
 
 // Manipular Publicação Direta do Administrador
 async function purgeUnwantedArticles() {
-  if (!confirm("Deseja eliminar todas as publicacoes nao aprovadas ou artigos de demonstracao anteriores? Apenas publicacoes aprovadas serao mantidas.")) return;
   const toDelete = (State.articles || []).filter(a => ['1','2','3','4'].includes(String(a.id)) || a.status !== 'Published');
   for (const art of toDelete) {
     await deleteArticleFromCloud(art.id);
@@ -2481,7 +2413,11 @@ async function fetchArticles() {
   }
 }
 
-function renderArticles() { const grid = document.getElementById('articlesGrid'); if (!grid) return; const filtered = (State.articles || []).filter(art => { if (art.status !== 'Published') return false;
+function renderArticles() {
+  const grid = document.getElementById('articlesGrid');
+  if (!grid) return;
+
+  const filtered = State.articles.filter(art => {
     // 1. Filtro por Área Temática
     const matchesField = State.activeField === 'all' || art.field === State.activeField;
 
