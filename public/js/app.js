@@ -785,7 +785,7 @@ const I18N = {
 };
 
 // Artigos Iniciais Padrão (Exemplificando os 4 Formatos: Artigo, História, Actividade e Projecto)
-const defaultArticlesData = [];
+// const defaultArticlesData = []; // Removido duplicado
 
 const defaultPartnersData = [
   { id: 3, name: 'Sociedades Científicas Africanas', category: 'Pesquisa & Patrimônio Acadêmico', icon: 'fas fa-book-reader', website_url: '#' },
