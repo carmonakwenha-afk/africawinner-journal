@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://africawinners-510716.web.app/sitemap.xml
 Sitemap: https://africawinner-journal.onrender.com/sitemap.xml

@@ -33,7 +33,7 @@
   --accent-amber: #f59e0b;
   --accent-crimson: #ef4444;
   --accent-crossref: #f26522;
-  --accent-ai: #8b5cf6;
+  --accent-imryd: #38bdf8;
 
   /* Tipografia & Texto */
   --text-primary: #ffffff;
@@ -42,8 +42,8 @@
   --text-gold: #f3cf7a;
 
   /* Tipografia do Modelo Empowered Voices */
-  --font-impact: 'Archivo Black', 'Montserrat', -apple-system, sans-serif;
-  --font-heading: 'Archivo Black', sans-serif;
+  --font-impact: 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-heading: 'Cinzel', 'Playfair Display', Georgia, serif;
   --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Cinzel', 'Playfair Display', Georgia, serif;
   --font-display: 'Archivo Black', sans-serif;
@@ -2902,3 +2902,179 @@ textarea.form-control {
   }
 }
 
+
+
+/* ==========================================================================
+   FRONTISPÍCIO EDITORIAL ACADÉMICO (JOURNAL COVER FRAME)
+   ========================================================================== */
+.journal-cover-frame {
+  position: relative;
+  background: linear-gradient(145deg, #09172c 0%, #0d223f 50%, #061120 100%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: var(--radius-md);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 2.25rem 1.75rem;
+  overflow: hidden;
+  text-align: center;
+}
+
+.journal-cover-frame::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: calc(var(--radius-md) - 4px);
+  pointer-events: none;
+}
+
+.journal-cover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--gold-light);
+}
+
+.journal-cover-body {
+  padding: 0.5rem 0.5rem 1rem;
+}
+
+.journal-seal-circle {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(9, 23, 44, 0.8) 100%);
+  border: 2px solid var(--gold-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-primary);
+  font-size: 2.3rem;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+}
+
+.journal-cover-title {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.journal-cover-subtitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.journal-cover-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--gold-gradient);
+  margin: 0 auto 1.15rem;
+}
+
+.journal-cover-desc {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 340px;
+  margin: 0 auto 1.5rem;
+}
+
+.journal-cover-leadership {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.journal-lead-line {
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.journal-lead-line i {
+  color: var(--gold-primary);
+}
+
+.journal-entity-line {
+  color: var(--gold-light);
+  font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.journal-cover-footer {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.journal-badge-open, .journal-badge-cert {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.journal-badge-open {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.journal-badge-cert {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold-light);
+  border: 1px solid var(--gold-border);
+}
+
+.btn-secondary-pill {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1.6rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary-pill:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--gold-primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+}

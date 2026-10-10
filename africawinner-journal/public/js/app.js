@@ -208,10 +208,10 @@ const I18N = {
     navAdmin: "Admin Panel",
     btnSignIn: "Sign In",
     btnRegister: "Register",
-    heroKicker: "African Scientific & Technological Innovation Initiative",
-    heroTitleMain: "EVERY COMMUNITY HAS STORIES & SCIENCE WORTH PRESERVING.",
+    heroKicker: "Iniciativa de Mentoria & Divulgação Científica em África",
+    heroTitleMain: "CADA COMUNIDADE TEM HISTÓRIAS & CIÊNCIA QUE MERECEM SER ETERNIZADAS.",
     heroTitleGold: "AfricaWinners Scientific Blog & Tech Hub",
-    heroDesc: "Uniting scientific mentorship under Founder Valdimir Jacinto Esteves, grassroots tech, and community storytelling to empower the next generation. Share your activity, project, research, or innovation with an Official Certificate.",
+    heroDesc: "Unimos mentoria científica sob a liderança do Fundador Valdimir Jacinto Esteves, tecnologia e divulgação comunitária para capacitar a nova geração de investigadores. Partilhe a sua actividade, projeto, artigo ou inovação com Certificado Oficial.",
     btnHeroExplore: "Explore Stories & Papers",
     btnSubmitHero: "Submit Article",
     btnAIHero: "AI Scientific Assistant",
@@ -383,10 +383,10 @@ const I18N = {
     navAdmin: "Panneau Admin",
     btnSignIn: "Connexion",
     btnRegister: "S'inscrire",
-    heroKicker: "Initiative Africaine d'Innovation & Mentorat Scientifique",
-    heroTitleMain: "CHAQUE COMMUNAUTÉ A DES HISTOIRES ET DES SCIENCES QUI MÉRITENT D'ÊTRE PRÉSERVÉES.",
+    heroKicker: "Iniciativa de Mentoria & Divulgação Científica em África",
+    heroTitleMain: "CADA COMUNIDADE TEM HISTÓRIAS & CIÊNCIA QUE MERECEM SER ETERNIZADAS.",
     heroTitleGold: "AfricaWinners Scientific Blog & Tech Hub",
-    heroDesc: "Alliant le mentorat scientifique sous la direction du Fondateur Valdimir Jacinto Esteves, technologie communautaire et diffusion ouverte. Partagez votre activité, projet, recherche ou innovation avec un Certificat Officiel.",
+    heroDesc: "Unimos mentoria científica sob a liderança do Fundador Valdimir Jacinto Esteves, tecnologia e divulgação comunitária para capacitar a nova geração de investigadores. Partilhe a sua actividade, projeto, artigo ou inovação com Certificado Oficial.",
     btnHeroExplore: "Explorer les Histoires & Articles",
     btnSubmitHero: "Soumettre un Article",
     btnAIHero: "Assistant IA Scientifique",
@@ -540,88 +540,45 @@ const I18N = {
 };
 
 // Artigos Iniciais Padrão (Exemplificando os 4 Formatos: Artigo, História, Actividade e Projecto)
-const defaultArticlesData = [
-  {
-    id: 1,
-    title: 'Inteligência Artificial e Robótica Aplicadas à Educação Científica e Tecnológica de Base em África',
-    abstract: 'Este estudo analisa o impacto da introdução precoce de módulos práticos de robótica educacional e algoritmos de visão computacional em escolas africanas. Os resultados apontam para um aumento de 64% na retenção de conceitos STEM e no desenvolvimento do pensamento crítico.',
-    keywords: 'Inteligência Artificial, Robótica Educacional, STEM África, Pedagogia Tecnológica',
-    field: 'Ciência da Computação & IA',
-    author_name: 'Dr. Valdimir Jacinto Esteves & Investigadores Associados',
-    institution: 'Academia STEM AfricaWinners / AWSJ Hub',
-    author_email: 'escritorioestevesemultisservic@gmail.com',
-    phone: '976161521',
-    publication_type: 'Artigo Científico',
-    contribution_type: 'Artigo Científico',
-    pdf_path: 'uploads/manuscrito-ia-robotica.pdf',
-    images: ['assets/hero-science.jpg'],
-    video_url: '',
-    status: 'Published',
-    certificate_id: 'AWSJ-CERT-2026-001', // Apenas Artigos têm certificação oficial
-    views_count: 1420,
-    downloads_count: 485
-  },
-  {
-    id: 2,
-    title: 'Da Oficina de Bairro ao Reconhecimento Acadêmico: A Trajetória de Superação de Jovens Makers em Luanda',
-    abstract: 'Um relato inspirador sobre como três jovens do município de Cazenga superaram escassez de recursos laboratoriais para construir sensores ambientais de baixo custo a partir de lixo eletrônico reciclado, inspirando dezenas de estudantes a ingressarem na engenharia.',
-    keywords: 'Superação, Makers, Inclusão Social, Reciclagem Tecnológica, Angola',
-    field: 'Educação Científica & STEM',
-    author_name: 'Manuel Kalandula (Líder Comunitário Maker)',
-    institution: 'Núcleo Juvenil de Robótica do Cazenga',
-    author_email: 'kalandula.maker@gmail.com',
-    phone: '976161521',
-    publication_type: 'História de Vencedor',
-    contribution_type: 'História de Vencedor',
-    pdf_path: null, // Sem documento exigido!
-    images: ['assets/hero-science.jpg'],
-    video_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    status: 'Published',
-    certificate_id: null, // Sem certificação
-    views_count: 1210,
-    downloads_count: 0
-  },
-  {
-    id: 3,
-    title: 'I Jornada Comunitária de Robótica e Astronomia: Capacitação Prática de 250 Crianças e Jovens',
-    abstract: 'Registo fotográfico e audiovisual da primeira jornada de popularização da ciência astronômica e robótica para o ensino primário e secundário. O evento reuniu oficinas de montagem de telescópios artesanais e circuitos básicos de automação sem necessidade de documentos formais.',
-    keywords: 'Jornada Científica, Robótica, Astronomia Comunitária, Extensão Acadêmica',
-    field: 'Educação Científica & STEM',
-    author_name: 'Comissão Organizadora AfricaWinners & Voluntários STEM',
-    institution: 'Escritório Esteves & Multi-Serviços / AfricaWinners',
-    author_email: 'escritorioestevesemultisservic@gmail.com',
-    phone: '976161521',
-    publication_type: 'Actividade',
-    contribution_type: 'Actividade',
-    pdf_path: null, // Sem documento exigido!
-    images: ['assets/hero-science.jpg'],
-    video_url: '',
-    status: 'Published',
-    certificate_id: null, // Sem certificação
-    views_count: 980,
-    downloads_count: 0
-  },
-  {
-    id: 4,
-    title: 'Protótipo Maker de Incubadora Automatizada de Baixo Custo com Sensores IoT para Agricultura Familiar',
-    abstract: 'Demonstração de um protótipo funcional de incubadora térmica com controlo PID implementado em microcontroladores ESP32 e monitoramento remoto por aplicativo mobile, desenvolvido para pequenos avicultores periféricos.',
-    keywords: 'IoT, Hardware Aberto, Agricultura Familiar, Automação, Prototipagem',
-    field: 'Biotecnologia & Agrociências',
-    author_name: 'Eng. K. Mensah & Maker Lab Luanda',
-    institution: 'Maker Lab Luanda / Hub Tecnológico Comunitário',
-    author_email: 'k.mensah@makerlab.ao',
-    phone: '976161521',
-    publication_type: 'Projecto',
-    contribution_type: 'Projecto',
-    pdf_path: null, // Sem documento exigido!
-    images: ['assets/hero-science.jpg'],
-    video_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    status: 'Published',
-    certificate_id: null, // Sem certificação
-    views_count: 1650,
-    downloads_count: 0
+
+// ==========================================================================
+// ARMAZENAMENTO PERSISTENTE (FIREBASE HOSTING & OFFLINE-FIRST)
+// ==========================================================================
+function getSavedArticles() {
+  const saved = localStorage.getItem('awsj_custom_articles');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
   }
-];
+  return [];
+}
+
+function saveArticlesLocally(articles) {
+  try {
+    localStorage.setItem('awsj_custom_articles', JSON.stringify(articles || []));
+  } catch(e) {
+    console.warn('Erro ao salvar artigos localmente:', e);
+  }
+}
+
+function getSavedPartners() {
+  const saved = localStorage.getItem('awsj_custom_partners');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  return [
+    { id: 1, name: 'Escritório Esteves & Multi-Serviços', category: 'Coordenação Editorial & Mentoria Científica', icon: 'fas fa-award', website_url: 'mailto:escritorioestevesemultisservic@gmail.com' }
+  ];
+}
+
+function savePartnersLocally(partners) {
+  try {
+    localStorage.setItem('awsj_custom_partners', JSON.stringify(partners || []));
+  } catch(e) {
+    console.warn('Erro ao salvar parceiros localmente:', e);
+  }
+}
+
+const defaultArticlesData = [];
 
 const defaultPartnersData = [
   { id: 3, name: 'Sociedades Científicas Africanas', category: 'Pesquisa & Patrimônio Acadêmico', icon: 'fas fa-book-reader', website_url: '#' },
@@ -636,8 +593,8 @@ const State = {
   currentUser: null,
   token: null,
   adminUnlocked: sessionStorage.getItem('awsj_admin_unlocked') === 'true',
-  articles: [...defaultArticlesData],
-  partners: [...defaultPartnersData],
+  articles: getSavedArticles(),
+  partners: getSavedPartners(),
   activeField: 'all',
   activePubType: 'all',
   searchQuery: '',
@@ -927,7 +884,7 @@ function setupPublicationTypeSelector() {
           reqBadge.innerText = '(Opcional - anexe apenas se possuir ficha técnica)';
         }
         if (manuscriptInput) manuscriptInput.required = false;
-        if (noticeText) noticeText.innerHTML = `<i class="fas fa-robot" style="color:#22d3ee;"></i> Ficheiro opcional. Mostre fotos do protótipo e insira link do vídeo de funcionamento.`;
+        if (noticeText) noticeText.innerHTML = `<i class="fas fa-microchip" style="color:#22d3ee;"></i> Ficheiro opcional. Mostre fotos do protótipo e insira link do vídeo de funcionamento.`;
         if (lblTitle) lblTitle.innerText = 'Título do Projecto / Protótipo Tech';
         if (lblAbstract) lblAbstract.innerText = 'Descrição Técnica da Inovação e Resultados Alcançados';
         if (inputTitle) inputTitle.placeholder = 'Ex: Braço Robótico Automatizado com Impressão 3D e Arduino para Escolas';
@@ -1558,7 +1515,7 @@ function renderAdminArticlesList(articles, container) {
       badgeIcon = 'fas fa-bullhorn';
     } else if (pubType.toLowerCase().includes('projecto') || pubType.toLowerCase().includes('projeto') || pubType.toLowerCase().includes('maker') || pubType.toLowerCase().includes('robótica')) {
       badgeClass = 'badge-pub-projecto';
-      badgeIcon = 'fas fa-robot';
+      badgeIcon = 'fas fa-microchip';
     }
 
     return `
@@ -2101,7 +2058,7 @@ async function deletePartner(partnerId) {
 }
 
 // ==========================================================================
-// ASSISTENTE DE INTELIGÊNCIA ARTIFICIAL (Estilo OpenAI)
+// VALIDADOR DE CONFORMIDADE METODOLÓGICA & NORMAS IMRyD
 // ==========================================================================
 async function handleAIAssistant(e) {
   e.preventDefault();
@@ -2114,76 +2071,100 @@ async function handleAIAssistant(e) {
   const targetLang = form.aiLang.value || State.lang;
 
   submitBtn.disabled = true;
-  submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> O Assistente IA está a analisar o artigo...`;
+  submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> A analisar conformidade metodológica IMRyD...`;
   resultBox.style.display = 'block';
-  resultBox.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);"><i class="fas fa-brain fa-spin" style="font-size:1.8rem; color:var(--accent-ai);"></i><p style="margin-top:0.75rem;">A processar redação científica, terminologia e síntese acadêmica...</p></div>`;
+  resultBox.innerHTML = `
+    <div style="text-align:center; padding:1.5rem; color:var(--text-muted);">
+      <i class="fas fa-microscope fa-spin" style="font-size:1.8rem; color:var(--gold-primary);"></i>
+      <p style="margin-top:0.75rem; font-size:0.88rem;">A verificar conformidade metodológica IMRyD, contagem de palavras e descritores científicos...</p>
+    </div>
+  `;
 
-  try {
-    const res = await fetch(`${API_BASE}/api/ai/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, text, targetLang })
-    });
-    const data = await res.json();
+  setTimeout(async () => {
+    try {
+      const words = text.split(/\s+/).filter(w => w.length > 0);
+      const wordCount = words.length;
+      const lower = text.toLowerCase();
 
-    if (data.success) {
-      if (typeof data.analysis === 'string') {
-        resultBox.innerHTML = `
-          <div style="background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.4); border-radius:var(--radius-md); padding:1.25rem; font-size:0.9rem; color:#ffffff; white-space:pre-wrap; line-height:1.7;">
-            <div style="color:var(--gold-light); font-weight:700; margin-bottom:0.75rem;"><i class="fas fa-robot"></i> Parecer do Assistente de IA (${data.source}):</div>
-            ${escapeHtml(data.analysis)}
-          </div>
-        `;
-      } else {
-        resultBox.innerHTML = `
-          <div style="background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.4); border-radius:var(--radius-md); padding:1.5rem; color:#ffffff;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-              <span style="color:var(--gold-light); font-weight:700; font-size:0.95rem;"><i class="fas fa-robot"></i> Parecer do Assistente IA (${data.source})</span>
-              <span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:0.2rem 0.5rem; border-radius:var(--radius-sm); text-transform:uppercase;">${data.language}</span>
-            </div>
-            
-            <div style="margin-bottom:1rem;">
-              <strong style="color:var(--gold-light); font-size:0.85rem; text-transform:uppercase;">Resumo Científico Estruturado:</strong>
-              <p style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.35rem; line-height:1.6;">${escapeHtml(data.analysis.summary)}</p>
-            </div>
+      const hasIntro = /(objetiv|propor|visa|analis|context|problem|motiva|finalidad|estudo|introdu|purpose|aim|objective|background|introduct|butoir)/i.test(lower);
+      const hasMethod = /(metodolog|m[ée]todo|procediment|materia|ensaio|amostra|experiment|t[ée]cnica|question[aá]ri|dados|colet|method|approach|materials|sample|dataset|d[ée]marche|exp[ée]rience)/i.test(lower);
+      const hasResults = /(resultad|demonstr|observou|verificou|evidenci|constat|efici[êe]ncia|indic|revel|impact|findings|showed|result|observed|r[ée]sultat|montr)/i.test(lower);
+      const hasConclusion = /(conclus|conclui|conclui-se|recomend|perspectiv|contribui|futur|conclusion|concluding|contribution|future|perspectives)/i.test(lower);
 
-            <div style="margin-bottom:1rem;">
-              <strong style="color:var(--gold-light); font-size:0.85rem; text-transform:uppercase;">Palavras-Chave Recomendadas:</strong>
-              <div style="font-size:0.85rem; color:#ffffff; margin-top:0.35rem;">${escapeHtml(data.analysis.keywords)}</div>
-            </div>
+      const sectionScores = [hasIntro, hasMethod, hasResults, hasConclusion].filter(Boolean).length;
+      const scorePercent = Math.round((sectionScores / 4) * 100);
 
-            <div>
-              <strong style="color:var(--gold-light); font-size:0.85rem; text-transform:uppercase;">Recomendações de Mentoria:</strong>
-              <p style="font-size:0.88rem; color:var(--text-secondary); margin-top:0.35rem; white-space:pre-line; line-height:1.6;">${escapeHtml(data.analysis.recommendations)}</p>
-            </div>
+      const stopWords = new Set(['de', 'a', 'o', 'que', 'e', 'do', 'da', 'em', 'um', 'para', 'com', 'não', 'uma', 'os', 'no', 'se', 'na', 'por', 'mais', 'as', 'dos', 'como', 'mas', 'ao', 'ele', 'das', 'à', 'seu', 'sua', 'ou', 'quando', 'muito', 'nos', 'já', 'eu', 'também', 'só', 'pelo', 'pela', 'até', 'isso', 'ela', 'entre', 'depois', 'sem', 'mesmo', 'aos', 'seus', 'quem', 'nas', 'me', 'esse', 'eles', 'você', 'essa', 'num', 'nem', 'suas', 'meu', 'às', 'minha', 'numa', 'pelos', 'elas', 'qual', 'nós', 'lhe', 'deles', 'essas', 'esses', 'pelas', 'este', 'dele', 'tu', 'te', 'vocês', 'vos', 'lhes', 'meus', 'minhas', 'teu', 'tua', 'teus', 'tuas', 'nosso', 'nossa', 'nossos', 'nossas', 'dela', 'delas', 'esta', 'estes', 'estas', 'aquele', 'aquela', 'aqueles', 'aquelas', 'isto', 'aquilo', 'estou', 'está', 'estamos', 'estão', 'the', 'and', 'to', 'of', 'in', 'is', 'for', 'that', 'on', 'with', 'as', 'by', 'at', 'an', 'are', 'from', 'be', 'this', 'which', 'or', 'it', 'study', 'paper', 'article']);
 
-            <button type="button" class="btn btn-outline btn-sm" style="margin-top:1rem;" onclick="applyAISuggestions('${escapeHtml(data.analysis.summary.replace(/'/g, "\\'"))}', '${escapeHtml(data.analysis.keywords.replace(/'/g, "\\'"))}')">
-              <i class="fas fa-check"></i> Aplicar no Formulário de Submissão
-            </button>
-          </div>
-        `;
+      const freqMap = {};
+      words.forEach(w => {
+        const clean = w.toLowerCase().replace(/[^a-záàâãéèêíïóôõöúçñ-]/gi, '');
+        if (clean.length > 4 && !stopWords.has(clean)) {
+          freqMap[clean] = (freqMap[clean] || 0) + 1;
+        }
+      });
+
+      const extractedKeywords = Object.entries(freqMap)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([k]) => k.charAt(0).toUpperCase() + k.slice(1))
+        .join(', ');
+
+      const keywordsFinal = extractedKeywords || 'Investigação Científica, Inovação Tecnológica, Desenvolvimento Sustentável, Metodologia IMRyD';
+
+      let formattedSummary = text;
+      if (!text.toLowerCase().includes('introdução') && !text.toLowerCase().includes('metodologia')) {
+        formattedSummary = `Introdução: ${title ? 'O presente trabalho aborda ' + title + '. ' : ''}${text}\n\nMetodologia: Adotou-se uma abordagem analítica e descritiva orientada aos requisitos metodológicos do portal.\n\nResultados: Os dados analisados demonstram a relevância das observações e a aplicabilidade das soluções apresentadas.\n\nConclusão: Conclui-se que o estudo contribui para o avanço da inovação e documentação acadêmica.`;
       }
-    } else {
-      resultBox.innerHTML = `<div style="color:var(--accent-crimson); padding:1rem;">${data.message || 'Erro ao processar.'}</div>`;
+
+      let lengthBadge = wordCount < 150 
+        ? `<span style="background:rgba(234,179,8,0.15); color:#facc15; padding:0.25rem 0.6rem; border-radius:4px; font-size:0.75rem; border:1px solid rgba(234,179,8,0.3);"><i class="fas fa-exclamation-triangle"></i> Resumo Conciso (${wordCount} palavras • Mínimo: 150)</span>`
+        : (wordCount > 250 
+          ? `<span style="background:rgba(234,179,8,0.15); color:#facc15; padding:0.25rem 0.6rem; border-radius:4px; font-size:0.75rem; border:1px solid rgba(234,179,8,0.3);"><i class="fas fa-info-circle"></i> Extensão Ampla (${wordCount} palavras • Máximo padrão: 250)</span>`
+          : `<span style="background:rgba(16,185,129,0.15); color:#34d399; padding:0.25rem 0.6rem; border-radius:4px; font-size:0.75rem; border:1px solid rgba(16,185,129,0.3);"><i class="fas fa-check-circle"></i> Extensão Ideal (${wordCount} palavras • Padrão Internacional)</span>`);
+
+      let recommendationText = scorePercent === 100
+        ? 'O manuscrito atende plenamente à estrutura clássica IMRyD. Consistência formal aprovada para submissão.'
+        : 'Para alcançar 100% de conformidade, recomenda-se detalhar mais a metodologia, objetivos e resultados.';
+
+      resultBox.innerHTML = `
+        <div style="background:linear-gradient(180deg, #09172a 0%, #060e1a 100%); border:1px solid var(--gold-border); border-radius:var(--radius-md); padding:1.5rem; color:#ffffff;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:0.75rem;">
+            <div>
+              <div style="font-size:0.72rem; text-transform:uppercase; color:var(--gold-light); font-weight:700;"><i class="fas fa-scroll"></i> Relatório Metodológico</div>
+              <h4 style="margin:0.25rem 0 0; font-family:var(--font-serif); font-size:1.15rem; color:#ffffff;">Padrão Editorial IMRyD</h4>
+            </div>
+            <span style="font-size:0.85rem; font-weight:700; color:var(--gold-primary); background:rgba(212,175,55,0.12); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); border:1px solid var(--gold-border);">Conformidade: ${scorePercent}%</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:0.5rem; margin-bottom:1rem;">
+            <div style="padding:0.5rem; border-radius:4px; background:${hasIntro ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; text-align:center; font-size:0.75rem;">[I] Intro: ${hasIntro ? '✓' : '✗'}</div>
+            <div style="padding:0.5rem; border-radius:4px; background:${hasMethod ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; text-align:center; font-size:0.75rem;">[M] Método: ${hasMethod ? '✓' : '✗'}</div>
+            <div style="padding:0.5rem; border-radius:4px; background:${hasResults ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; text-align:center; font-size:0.75rem;">[R] Resultados: ${hasResults ? '✓' : '✗'}</div>
+            <div style="padding:0.5rem; border-radius:4px; background:${hasConclusion ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; text-align:center; font-size:0.75rem;">[D] Conclusão: ${hasConclusion ? '✓' : '✗'}</div>
+          </div>
+          <div style="margin-bottom:1rem;">${lengthBadge}</div>
+          <div style="margin-bottom:1rem; background:rgba(0,0,0,0.25); padding:0.75rem; border-radius:4px;"><strong style="color:var(--gold-light); font-size:0.8rem; display:block; margin-bottom:0.25rem;">Parecer:</strong><p style="font-size:0.85rem; color:var(--text-secondary); margin:0;">${recommendationText}</p></div>
+          <div style="margin-bottom:1rem;"><strong style="color:var(--gold-light); font-size:0.8rem; display:block; margin-bottom:0.25rem;">Descritores (DeCS / MeSH):</strong><div style="font-size:0.85rem; color:#ffffff; background:rgba(212,175,55,0.08); padding:0.4rem 0.6rem; border-radius:4px; border:1px solid var(--gold-border);">${escapeHtml(keywordsFinal)}</div></div>
+          <button type="button" class="btn btn-brand-pill btn-sm" onclick="applyAISuggestions('${escapeHtml(formattedSummary.replace(/'/g, "\\'").replace(/\n/g, '\\n'))}', '${escapeHtml(keywordsFinal.replace(/'/g, "\\'"))}')"><i class="fas fa-check"></i> Inserir no Formulário de Submissão</button>
+        </div>
+      `;
+    } catch(err) {
+      resultBox.innerHTML = '<div style="color:var(--accent-crimson); padding:1rem;">Erro ao analisar resumo.</div>';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-check-double"></i> Verificar Conformidade IMRyD';
     }
-  } catch (err) {
-    resultBox.innerHTML = `<div style="color:var(--accent-crimson); padding:1rem;">Erro de conexão com o Assistente de IA.</div>`;
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = `<i class="fas fa-magic"></i> Analisar & Otimizar Artigo com IA`;
-  }
+  }, 400);
 }
 
 function applyAISuggestions(summary, keywords) {
   const abstractInput = document.getElementById('submitAbstract');
   const keywordsInput = document.getElementById('submitKeywords');
-
   if (abstractInput) abstractInput.value = summary;
   if (keywordsInput) keywordsInput.value = keywords;
-
   closeAllModals();
   smoothScrollTo('#submissao');
-  showToast('Sugestões da IA inseridas com sucesso no formulário!', 'success');
+  showToast('Estrutura metodológica e descritores inseridos com sucesso no formulário!', 'success');
 }
 
 // ==========================================================================
@@ -2350,7 +2331,7 @@ function renderArticles() {
       typeLabel = 'Actividade';
     } else if (rawType.toLowerCase().includes('projecto') || rawType.toLowerCase().includes('projeto') || rawType.toLowerCase().includes('maker') || rawType.toLowerCase().includes('robótica')) {
       typeClass = 'badge-pub-projecto';
-      typeIcon = 'fas fa-robot';
+      typeIcon = 'fas fa-microchip';
       typeLabel = 'Projecto Tech';
     }
 
@@ -2463,7 +2444,7 @@ function viewArticleDetails(id) {
   } else if (rawType.toLowerCase().includes('actividade') || rawType.toLowerCase().includes('atividade')) {
     typeBadge = '<span class="badge-pub-type badge-pub-actividade"><i class="fas fa-bullhorn"></i> Actividade Comunitária</span>';
   } else if (rawType.toLowerCase().includes('projecto') || rawType.toLowerCase().includes('projeto') || rawType.toLowerCase().includes('maker') || rawType.toLowerCase().includes('robótica')) {
-    typeBadge = '<span class="badge-pub-type badge-pub-projecto"><i class="fas fa-robot"></i> Projecto Tech</span>';
+    typeBadge = '<span class="badge-pub-type badge-pub-projecto"><i class="fas fa-microchip"></i> Projecto Tech</span>';
   }
 
   // Parse imagens
