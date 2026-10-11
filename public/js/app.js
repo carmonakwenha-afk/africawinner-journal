@@ -56,16 +56,32 @@ function savePartnersLocally(partners) {
 // SINCRONIZAÇÃO EM NUVEM VIA CLOUD FIRESTORE (TEMPO REAL & PERSISTENTE)
 // ==========================================================================
 let db = null;
+let cloudStorage = null;
 try {
-  if (typeof firebase !== 'undefined' && firebase.firestore) {
+  if (typeof firebase !== 'undefined') {
     if (!firebase.apps || !firebase.apps.length) {
-      try { firebase.initializeApp({ projectId: 'africawinners-510716' }); } catch (initErr) {}
+      try {
+        firebase.initializeApp({
+          projectId: 'africawinners-510716',
+          storageBucket: 'africawinners-510716.appspot.com'
+        });
+      } catch (initErr) {}
     }
-    db = firebase.firestore();
-    console.log('🔥 Cloud Firestore conectado com sucesso ao projeto africawinners-510716');
+    if (firebase.firestore) {
+      db = firebase.firestore();
+      console.log('🔥 Cloud Firestore conectado com sucesso ao projeto africawinners-510716');
+    }
+    if (firebase.storage) {
+      try {
+        cloudStorage = firebase.storage();
+        console.log('☁️ Firebase Cloud Storage conectado com sucesso');
+      } catch (stErr) {
+        console.warn('Aviso ao inicializar Firebase Storage:', stErr);
+      }
+    }
   }
 } catch (e) {
-  console.warn('Modo offline/fallback local (Firestore não inicializado):', e);
+  console.warn('Modo offline/fallback local (Firebase não inicializado):', e);
 }
 
 function fileToBase64(file) {
@@ -76,6 +92,102 @@ function fileToBase64(file) {
     reader.onerror = () => resolve(null);
     reader.readAsDataURL(file);
   });
+}
+
+function compressImage(file, maxWidth = 1200, quality = 0.8) {
+  return new Promise((resolve) => {
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      return resolve(file);
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          resolve(blob || file);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadFileToCloud(file, folder = 'uploads') {
+  if (!file) return null;
+  if (cloudStorage) {
+    try {
+      const cleanName = (file.name || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
+      const uniquePath = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${cleanName}`;
+      const storageRef = cloudStorage.ref().child(uniquePath);
+      const snapshot = await storageRef.put(file);
+      const downloadUrl = await snapshot.ref.getDownloadURL();
+      if (downloadUrl) {
+        console.log('☁️ Ficheiro guardado no Firebase Cloud Storage:', downloadUrl);
+        return downloadUrl;
+      }
+    } catch (storageErr) {
+      console.warn('Firebase Storage offline, a usar fallback Base64:', storageErr);
+    }
+  }
+  let fileToConvert = file;
+  if (file.type && file.type.startsWith('image/')) {
+    try { fileToConvert = await compressImage(file, 1200, 0.8); } catch(e) {}
+  }
+  try {
+    return await fileToBase64(fileToConvert);
+  } catch (err) {
+    return null;
+  }
+}
+
+function downloadArticlePdf(articleId) {
+  const art = (State.articles || []).find(a => String(a.id) === String(articleId));
+  if (!art) {
+    showToast('Ficheiro do manuscrito não encontrado.', 'warning');
+    return;
+  }
+  if (art.pdf_url && art.pdf_url.startsWith('http')) {
+    window.open(art.pdf_url, '_blank');
+    return;
+  }
+  if (art.pdf_data && art.pdf_data.startsWith('data:')) {
+    const safeName = (art.pdf_filename || `${(art.title || 'manuscrito').slice(0, 30)}.pdf`).replace(/[/\\?%*:|"<>]/g, '_');
+    const link = document.createElement('a');
+    link.href = art.pdf_data;
+    link.download = safeName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    return;
+  }
+  if (art.pdf_path && (art.pdf_path.startsWith('http') || art.pdf_path.startsWith('data:'))) {
+    if (art.pdf_path.startsWith('data:')) {
+      const link = document.createElement('a');
+      link.href = art.pdf_path;
+      link.download = `${(art.title || 'manuscrito').slice(0, 30)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(art.pdf_path, '_blank');
+    }
+    return;
+  }
+  window.open(`${API_BASE}/api/articles/${articleId}/download`, '_blank');
 }
 
 async function saveArticleToCloud(article) {
@@ -729,6 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setLanguage(State.lang);
   initAuth();
   initGoogleAuth();
+  initCloudSync();
   fetchJournalStats();
   fetchArticles();
   loadPartners();
@@ -1791,7 +1904,7 @@ function renderAdminArticlesList(articles, container) {
         <td>
           <div style="display:flex; flex-direction:column; gap:0.35rem;">
             ${hasPdf ? `
-              <a href="${API_BASE}/api/articles/${art.id}/download" class="btn btn-outline btn-sm" target="_blank">
+              <a type="button" class="btn btn-outline btn-sm" onclick="downloadArticlePdf('${art.id}')">
                 <i class="fas fa-file-pdf"></i> PDF
               </a>
             ` : `
@@ -2035,28 +2148,58 @@ async function handleAdminDirectPublish(e) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> A publicar ${pubType}...`;
 
-  const localImages = State.adminSelectedPhotos.map(p => URL.createObjectURL(p));
+  const uploadedImages = [];
+  if (State.adminSelectedPhotos && State.adminSelectedPhotos.length > 0) {
+    for (const p of State.adminSelectedPhotos) {
+      try {
+        const pUrl = await uploadFileToCloud(p, 'photos');
+        if (pUrl) uploadedImages.push(pUrl);
+      } catch (err) {}
+    }
+  }
+
+  let adminDocUrl = null, adminDocData = null, adminDocName = null;
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    adminDocName = file.name;
+    try {
+      const upDoc = await uploadFileToCloud(file, 'manuscripts');
+      if (upDoc) {
+        if (upDoc.startsWith('data:')) adminDocData = upDoc;
+        else adminDocUrl = upDoc;
+      }
+    } catch (err) {}
+  }
+
+  const artId = Date.now();
   const newArt = {
-    id: Date.now() % 100000,
-    title: form.adminTitle.value,
-    abstract: form.adminAbstract.value,
-    keywords: form.adminKeywords.value,
+    id: artId,
+    title: form.adminTitle.value.trim(),
+    abstract: form.adminAbstract.value.trim(),
+    keywords: form.adminKeywords.value.trim(),
     field: form.adminField.value,
-    author_name: form.adminAuthorName.value,
-    author_email: form.adminAuthorEmail.value,
-    institution: form.adminInstitution.value,
-    phone: form.adminPhone.value || '976161521',
+    author_name: form.adminAuthorName.value.trim(),
+    author_email: form.adminAuthorEmail.value.trim(),
+    institution: form.adminInstitution.value.trim(),
+    phone: (form.adminPhone && form.adminPhone.value) ? form.adminPhone.value.trim() : '976161521',
     publication_type: pubType,
     contribution_type: pubType,
-    pdf_path: (fileInput && fileInput.files && fileInput.files[0]) ? 'uploads/direct-doc.pdf' : null,
-    images: localImages.length > 0 ? localImages : null,
-    video_url: form.adminVideoUrl ? form.adminVideoUrl.value : '',
+    pdf_path: adminDocUrl || (adminDocData ? 'data:embedded-pdf' : null),
+    pdf_url: adminDocUrl,
+    pdf_data: adminDocData,
+    pdf_filename: adminDocName,
+    images: uploadedImages.length > 0 ? uploadedImages : null,
+    video_url: (form.adminVideoUrl && form.adminVideoUrl.value) ? form.adminVideoUrl.value.trim() : '',
     status: 'Published',
-    certificate_id: isArticle ? `AWSJ-CERT-2026-${Date.now().toString().slice(-4)}` : null,
+    certificate_id: isArticle ? `AWSJ-CERT-2026-${String(artId).slice(-4)}` : null,
     views_count: 1,
-    downloads_count: 0
+    downloads_count: 0,
+    created_at: new Date().toISOString()
   };
+
   State.articles.unshift(newArt);
+  saveArticlesLocally(State.articles);
+  await saveArticleToCloud(newArt);
 
   try {
     const res = await fetch(`${API_BASE}/api/admin/articles/direct-publish`, {
@@ -2096,6 +2239,20 @@ async function updateArticleStatus(articleId, newStatus) {
   if (!newStatus) return;
 
   const notes = prompt(`Introduza a nota de mentoria para o autor (opcional):`, `Estado atualizado para ${newStatus} pelo Mentor Valdimir Jacinto Esteves.`);
+
+  const art = (State.articles || []).find(a => String(a.id) === String(articleId));
+  if (art) {
+    art.status = newStatus;
+    if (notes) art.editorial_notes = notes;
+    art.updated_at = new Date().toISOString();
+    saveArticlesLocally(State.articles);
+    await saveArticleToCloud(art);
+  }
+
+  showToast(`Estado da publicação #${articleId} atualizado para "${newStatus}"!`, 'success');
+  loadAdminArticles();
+  renderArticles();
+  fetchJournalStats();
 
   try {
     const res = await fetch(`${API_BASE}/api/admin/articles/${articleId}/status`, {
@@ -2665,7 +2822,7 @@ function renderArticles() {
                 <i class="fas fa-book-reader"></i> Ler Resumo
               </button>
               ${hasPdf ? `
-                <a href="${API_BASE}/api/articles/${art.id}/download" class="btn btn-primary btn-sm" target="_blank">
+                <a type="button" class="btn btn-primary btn-sm" onclick="downloadArticlePdf('${art.id}')">
                   <i class="fas fa-file-pdf"></i> PDF
                 </a>
               ` : `
@@ -2845,7 +3002,7 @@ function viewArticleDetails(id) {
 
         <div style="display:flex; gap:0.75rem; align-items:center;">
           ${hasPdf ? `
-            <a href="${API_BASE}/api/articles/${art.id}/download" class="btn btn-primary btn-sm" target="_blank">
+            <a type="button" class="btn btn-primary btn-sm" onclick="downloadArticlePdf('${art.id}')">
               <i class="fas fa-file-pdf"></i> Baixar Manuscrito Completo (PDF)
             </a>
           ` : `
@@ -2914,31 +3071,65 @@ async function handleSubmission(e) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> A submeter ${pubType}...`;
 
-  // Pré-visualização local imediata
-  const localImagePreviews = State.selectedPhotos.map(p => URL.createObjectURL(p));
+  const uploadedPhotos = [];
+  if (State.selectedPhotos && State.selectedPhotos.length > 0) {
+    for (const photo of State.selectedPhotos) {
+      try {
+        const pUrl = await uploadFileToCloud(photo, 'photos');
+        if (pUrl) uploadedPhotos.push(pUrl);
+      } catch (err) {}
+    }
+  }
+
+  let manuscriptUrl = null, manuscriptData = null, manuscriptName = null;
+  if (State.selectedFile) {
+    manuscriptName = State.selectedFile.name;
+    try {
+      const upDoc = await uploadFileToCloud(State.selectedFile, 'manuscripts');
+      if (upDoc) {
+        if (upDoc.startsWith('data:')) manuscriptData = upDoc;
+        else manuscriptUrl = upDoc;
+      }
+    } catch (err) {}
+  }
+
+  const subId = Date.now();
+  const isAdminUser = !!(
+    (State.currentUser && (State.currentUser.role === 'admin' || State.currentUser.email === 'escritorioestevesemultisservic@gmail.com')) ||
+    State.adminUnlocked
+  );
+  const initialStatus = isAdminUser ? 'Published' : 'Under Peer Review';
+
   const newSub = {
-    id: Date.now() % 100000,
-    title: form.title.value,
-    abstract: form.abstract.value,
-    keywords: form.keywords.value,
+    id: subId,
+    title: form.title.value.trim(),
+    abstract: form.abstract.value.trim(),
+    keywords: form.keywords.value.trim(),
     field: form.field.value,
-    author_name: form.author_name.value,
-    author_email: form.author_email.value,
-    institution: form.institution.value,
-    phone: form.phone.value || '976161521',
+    author_name: form.author_name.value.trim(),
+    author_email: form.author_email.value.trim(),
+    institution: form.institution.value.trim(),
+    phone: (form.phone && form.phone.value) ? form.phone.value.trim() : '976161521',
     publication_type: pubType,
     contribution_type: pubType,
-    original_journal: form.original_journal ? form.original_journal.value : '',
-    original_url: form.original_url ? form.original_url.value : '',
-    pdf_path: State.selectedFile ? 'uploads/pending-doc.pdf' : null,
-    images: localImagePreviews.length > 0 ? localImagePreviews : null,
-    video_url: form.video_url ? form.video_url.value : '',
-    status: 'Under Peer Review',
-    certificate_id: isArticle ? `AWSJ-CERT-2026-${Date.now().toString().slice(-4)}` : null,
+    original_journal: form.original_journal ? form.original_journal.value.trim() : '',
+    original_url: form.original_url ? form.original_url.value.trim() : '',
+    pdf_path: manuscriptUrl || (manuscriptData ? 'data:embedded-pdf' : null),
+    pdf_url: manuscriptUrl,
+    pdf_data: manuscriptData,
+    pdf_filename: manuscriptName,
+    images: uploadedPhotos.length > 0 ? uploadedPhotos : null,
+    video_url: (form.video_url && form.video_url.value) ? form.video_url.value.trim() : '',
+    status: initialStatus,
+    certificate_id: isArticle ? `AWSJ-CERT-2026-${String(subId).slice(-4)}` : null,
     views_count: 0,
-    downloads_count: 0
+    downloads_count: 0,
+    created_at: new Date().toISOString()
   };
+
   State.articles.unshift(newSub);
+  saveArticlesLocally(State.articles);
+  await saveArticleToCloud(newSub);
 
   try {
     const res = await fetch(`${API_BASE}/api/articles/submit`, {
