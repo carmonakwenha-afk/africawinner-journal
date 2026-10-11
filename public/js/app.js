@@ -1043,12 +1043,18 @@ function setupPublicationTypeSelector() {
     card.addEventListener('click', () => {
       grid.querySelectorAll('.pub-type-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
-      const type = card.getAttribute('data-type');
-      if (hiddenInput) hiddenInput.value = type;
+      const rawType = card.getAttribute('data-type') || 'Artigo Científico';
+      if (hiddenInput) hiddenInput.value = rawType;
+
+      const norm = rawType.toLowerCase();
+      const isArticle = norm.includes('artigo');
+      const isHistoria = norm.includes('hist') || norm.includes('vencedor');
+      const isActividade = norm.includes('act') || norm.includes('ativid');
+      const isProjecto = norm.includes('proj') || norm.includes('tech') || norm.includes('maker');
 
       if (banner) banner.className = 'pub-type-feedback-banner';
 
-      if (type === 'Artigo Científico') {
+      if (isArticle) {
         if (banner) banner.classList.add('is-artigo');
         if (bannerText) bannerText.innerHTML = `<strong>Modo Artigo Científico:</strong> Esta modalidade formal exige o envio do documento completo (.PDF ou .DOCX) para o processo de mentoria acadêmica e emissão de Certificado Oficial.`;
         if (reqBadge) {
@@ -1061,40 +1067,49 @@ function setupPublicationTypeSelector() {
         if (lblAbstract) lblAbstract.innerText = 'Resumo Estruturado (Mínimo 150 palavras)';
         if (inputTitle) inputTitle.placeholder = 'Ex: Modelos Preditivos de IA para Otimização Tecnológica em África';
         if (inputAbstract) inputAbstract.placeholder = 'Apresente os objetivos, metodologia aplicada, resultados e conclusões...';
-      } else if (type === 'História de Vencedor') {
+      } else if (isHistoria) {
         if (banner) banner.classList.add('is-historia');
         if (bannerText) bannerText.innerHTML = `<strong>Modo História de Vencedor:</strong> <u>Não é exigido documento!</u> Partilhe a sua narrativa no resumo e enriqueça a publicação com fotos e vídeos da sua trajetória de superação e vitória.`;
         if (reqBadge) {
           reqBadge.className = 'badge-req-opcional';
           reqBadge.innerText = '(Opcional - anexe apenas se possuir documento)';
         }
-        if (manuscriptInput) manuscriptInput.required = false;
+        if (manuscriptInput) {
+          manuscriptInput.required = false;
+          manuscriptInput.removeAttribute('required');
+        }
         if (noticeText) noticeText.innerHTML = `<i class="fas fa-camera" style="color:#34d399;"></i> Ficheiro opcional. Dê destaque às fotos da jornada comunitária, momentos marcantes e ao relato de vitória.`;
         if (lblTitle) lblTitle.innerText = 'Título da História de Vencedor';
         if (lblAbstract) lblAbstract.innerText = 'Relato Completo da Superação e Trajetória';
         if (inputTitle) inputTitle.placeholder = 'Ex: Como uma ideia no bairro virou uma solução comunitária inovadora';
         if (inputAbstract) inputAbstract.placeholder = 'Conte a sua história, as dificuldades superadas, a vitória alcançada e o impacto comunitário...';
-      } else if (type === 'Actividade') {
+      } else if (isActividade) {
         if (banner) banner.classList.add('is-actividade');
         if (bannerText) bannerText.innerHTML = `<strong>Modo Actividade Comunitária:</strong> <u>Não é exigido documento!</u> Descreva o evento, oficina ou jornada científica e envie os registos fotográficos e vídeos dos participantes.`;
         if (reqBadge) {
           reqBadge.className = 'badge-req-opcional';
           reqBadge.innerText = '(Opcional - anexe apenas se possuir relatório de evento)';
         }
-        if (manuscriptInput) manuscriptInput.required = false;
+        if (manuscriptInput) {
+          manuscriptInput.required = false;
+          manuscriptInput.removeAttribute('required');
+        }
         if (noticeText) noticeText.innerHTML = `<i class="fas fa-bullhorn" style="color:#34d399;"></i> Ficheiro opcional. Anexe fotos do evento e vídeos da actividade científica.`;
         if (lblTitle) lblTitle.innerText = 'Título da Actividade Científica / Comunitária';
         if (lblAbstract) lblAbstract.innerText = 'Descrição da Actividade, Metodologia e Impacto';
         if (inputTitle) inputTitle.placeholder = 'Ex: Jornada de Robótica e Astronomia com Jovens da Comunidade';
         if (inputAbstract) inputAbstract.placeholder = 'Descreva a data, público-alvo, actividades realizadas, resultados e lições aprendidas...';
-      } else if (type === 'Projecto') {
+      } else if (isProjecto) {
         if (banner) banner.classList.add('is-projecto');
         if (bannerText) bannerText.innerHTML = `<strong>Modo Projecto Tech:</strong> <u>Não é exigido documento!</u> Apresente o seu protótipo, hardware ou software inovador com fotos do projeto e link de demonstração em vídeo.`;
         if (reqBadge) {
           reqBadge.className = 'badge-req-opcional';
           reqBadge.innerText = '(Opcional - anexe apenas se possuir ficha técnica)';
         }
-        if (manuscriptInput) manuscriptInput.required = false;
+        if (manuscriptInput) {
+          manuscriptInput.required = false;
+          manuscriptInput.removeAttribute('required');
+        }
         if (noticeText) noticeText.innerHTML = `<i class="fas fa-microchip" style="color:#22d3ee;"></i> Ficheiro opcional. Mostre fotos do protótipo e insira link do vídeo de funcionamento.`;
         if (lblTitle) lblTitle.innerText = 'Título do Projecto / Protótipo Tech';
         if (lblAbstract) lblAbstract.innerText = 'Descrição Técnica da Inovação e Resultados Alcançados';
@@ -1816,7 +1831,7 @@ function renderAdminArticlesList(articles, container) {
   }
 
   container.innerHTML = articles.map(art => {
-    const pubType = art.publication_type || art.contribution_type || 'Artigo Científico';
+    const pubType = (document.getElementById('submitPublicationType')?.value || (form.publication_type && form.publication_type.value) || 'Artigo Científico').trim();
     const isArticle = pubType.toLowerCase().includes('artigo');
     const certCode = isArticle ? (art.certificate_id || `AWSJ-CERT-2026-${art.id}`) : null;
     const phoneClean = (art.phone || '976161521').replace(/\D/g, '');
@@ -3002,7 +3017,7 @@ async function handleSubmission(e) {
   const form = e.target;
   const submitBtn = form.querySelector('button[type="submit"]');
 
-  const pubType = (form.publication_type && form.publication_type.value) || 'Artigo Científico';
+  const pubType = (document.getElementById('submitPublicationType')?.value || (form.publication_type && form.publication_type.value) || 'Artigo Científico').trim();
   const isArticle = pubType.toLowerCase().includes('artigo');
 
   // Condição estrita exigida pelo utilizador:
