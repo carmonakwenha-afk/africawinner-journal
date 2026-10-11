@@ -1024,7 +1024,7 @@ function setupEventListeners() {
 // -------------------------------------------------------------
 // SELETORES DE FORMATO DE PUBLICAÇÃO & GESTÃO MULTIMÉDIA
 // -------------------------------------------------------------
-function setupPublicationTypeSelector() {
+window.selectPublicationType = function(rawType) {
   const grid = document.getElementById('submissionPubTypeGrid');
   const hiddenInput = document.getElementById('submitPublicationType');
   const banner = document.getElementById('pubTypeFeedbackBanner');
@@ -1036,89 +1036,111 @@ function setupPublicationTypeSelector() {
   const lblAbstract = document.getElementById('lblAbstractText');
   const inputTitle = document.getElementById('submitTitle');
   const inputAbstract = document.getElementById('submitAbstract');
+  const submitBtn = document.getElementById('submitButton');
 
+  const selectedType = rawType || 'Artigo Científico';
+  if (hiddenInput) hiddenInput.value = selectedType;
+
+  if (grid) {
+    grid.querySelectorAll('.pub-type-card').forEach(c => {
+      const cType = (c.getAttribute('data-type') || '').toLowerCase();
+      const sType = selectedType.toLowerCase();
+      if ((sType.includes('hist') && cType.includes('hist')) ||
+          (sType.includes('act') && cType.includes('act')) ||
+          (sType.includes('proj') && cType.includes('proj')) ||
+          (sType.includes('artigo') && cType.includes('artigo'))) {
+        c.classList.add('active');
+      } else {
+        c.classList.remove('active');
+      }
+    });
+  }
+
+  // NENHUM FORMATO EXIGE DOCUMENTO OBRIGATÓRIO (100% OPCIONAL EM TODOS)
+  if (manuscriptInput) {
+    manuscriptInput.required = false;
+    manuscriptInput.removeAttribute('required');
+  }
+
+  const norm = selectedType.toLowerCase();
+  const isArticle = norm.includes('artigo');
+  const isHistoria = norm.includes('hist') || norm.includes('vencedor');
+  const isActividade = norm.includes('act') || norm.includes('ativid');
+  const isProjecto = norm.includes('proj') || norm.includes('tech') || norm.includes('maker');
+
+  if (banner) banner.className = 'pub-type-feedback-banner';
+
+  if (isArticle) {
+    if (banner) banner.classList.add('is-artigo');
+    if (bannerText) bannerText.innerHTML = `<strong>Modo Artigo Científico:</strong> Envio de manuscrito <u>opcional</u> (.PDF ou .DOCX). Se anexar documento, receberá mentoria dedicada e Certificado Oficial de Publicação.`;
+    if (reqBadge) {
+      reqBadge.className = 'badge-req-opcional';
+      reqBadge.innerText = '(Opcional - anexe se possuir documento)';
+    }
+    if (noticeText) noticeText.innerHTML = `<i class="fas fa-info-circle" style="color:var(--gold-primary);"></i> O ficheiro em formato PDF ou DOCX é opcional. Pode submeter diretamente com o resumo.`;
+    if (lblTitle) lblTitle.innerText = 'Título Completo do Artigo Científico';
+    if (lblAbstract) lblAbstract.innerText = 'Resumo Estruturado (ou Texto Completo)';
+    if (inputTitle) inputTitle.placeholder = 'Ex: Modelos Preditivos de IA para Otimização Tecnológica em África';
+    if (inputAbstract) inputAbstract.placeholder = 'Apresente os objetivos, metodologia aplicada, resultados e conclusões...';
+  } else if (isHistoria) {
+    if (banner) banner.classList.add('is-historia');
+    if (bannerText) bannerText.innerHTML = `<strong>Modo História de Vencedor:</strong> <u>Documento livre!</u> Partilhe a sua narrativa de superação no campo de texto abaixo e enriqueça com fotos e vídeos da sua trajetória de vitória.`;
+    if (reqBadge) {
+      reqBadge.className = 'badge-req-opcional';
+      reqBadge.innerText = '(Opcional - fotos e vídeos recomendados)';
+    }
+    if (noticeText) noticeText.innerHTML = `<i class="fas fa-camera" style="color:#34d399;"></i> Ficheiro opcional. Dê destaque às fotos da jornada comunitária, momentos marcantes e ao relato de vitória.`;
+    if (lblTitle) lblTitle.innerText = 'Título da História de Vencedor';
+    if (lblAbstract) lblAbstract.innerText = 'Relato Completo da Superação e Trajetória';
+    if (inputTitle) inputTitle.placeholder = 'Ex: Como uma ideia no bairro virou uma solução comunitária inovadora';
+    if (inputAbstract) inputAbstract.placeholder = 'Conte a sua história, as dificuldades superadas, a vitória alcançada e o impacto comunitário...';
+  } else if (isActividade) {
+    if (banner) banner.classList.add('is-actividade');
+    if (bannerText) bannerText.innerHTML = `<strong>Modo Actividade Comunitária:</strong> <u>Documento livre!</u> Descreva o evento, oficina ou jornada científica e envie os registos fotográficos e vídeos dos participantes.`;
+    if (reqBadge) {
+      reqBadge.className = 'badge-req-opcional';
+      reqBadge.innerText = '(Opcional - anexe apenas se possuir relatório)';
+    }
+    if (noticeText) noticeText.innerHTML = `<i class="fas fa-bullhorn" style="color:#34d399;"></i> Ficheiro opcional. Anexe fotos do evento e vídeos da actividade científica.`;
+    if (lblTitle) lblTitle.innerText = 'Título da Actividade Científica / Comunitária';
+    if (lblAbstract) lblAbstract.innerText = 'Descrição da Actividade, Metodologia e Impacto';
+    if (inputTitle) inputTitle.placeholder = 'Ex: Jornada de Robótica e Astronomia com Jovens da Comunidade';
+    if (inputAbstract) inputAbstract.placeholder = 'Descreva a data, público-alvo, actividades realizadas, resultados e lições aprendidas...';
+  } else if (isProjecto) {
+    if (banner) banner.classList.add('is-projecto');
+    if (bannerText) bannerText.innerHTML = `<strong>Modo Projecto Tech:</strong> <u>Documento livre!</u> Apresente o seu protótipo, hardware ou software inovador com fotos do projeto e link de demonstração em vídeo.`;
+    if (reqBadge) {
+      reqBadge.className = 'badge-req-opcional';
+      reqBadge.innerText = '(Opcional - anexe apenas se possuir ficha técnica)';
+    }
+    if (noticeText) noticeText.innerHTML = `<i class="fas fa-microchip" style="color:#22d3ee;"></i> Ficheiro opcional. Mostre fotos do protótipo e insira link do vídeo de funcionamento.`;
+    if (lblTitle) lblTitle.innerText = 'Título do Projecto / Protótipo Tech';
+    if (lblAbstract) lblAbstract.innerText = 'Descrição Técnica da Inovação e Resultados Alcançados';
+    if (inputTitle) inputTitle.placeholder = 'Ex: Braço Robótico Automatizado com Impressão 3D e Arduino para Escolas';
+    if (inputAbstract) inputAbstract.placeholder = 'Explique como funciona o projecto, tecnologias utilizadas, fase atual e impacto prático...';
+  }
+
+  if (submitBtn) {
+    submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Submeter ${selectedType}`;
+  }
+};
+
+function setupPublicationTypeSelector() {
+  const grid = document.getElementById('submissionPubTypeGrid');
   if (!grid) return;
 
   grid.querySelectorAll('.pub-type-card').forEach(card => {
+    card.style.cursor = 'pointer';
     card.addEventListener('click', () => {
-      grid.querySelectorAll('.pub-type-card').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
       const rawType = card.getAttribute('data-type') || 'Artigo Científico';
-      if (hiddenInput) hiddenInput.value = rawType;
-
-      const norm = rawType.toLowerCase();
-      const isArticle = norm.includes('artigo');
-      const isHistoria = norm.includes('hist') || norm.includes('vencedor');
-      const isActividade = norm.includes('act') || norm.includes('ativid');
-      const isProjecto = norm.includes('proj') || norm.includes('tech') || norm.includes('maker');
-
-      if (banner) banner.className = 'pub-type-feedback-banner';
-
-      if (isArticle) {
-        if (banner) banner.classList.add('is-artigo');
-        if (bannerText) bannerText.innerHTML = `<strong>Modo Artigo Científico:</strong> Esta modalidade formal exige o envio do documento completo (.PDF ou .DOCX) para o processo de mentoria acadêmica e emissão de Certificado Oficial.`;
-        if (reqBadge) {
-          reqBadge.className = 'badge-req-obrig';
-          reqBadge.innerText = '* (Obrigatório para Artigos Científicos)';
-        }
-        if (manuscriptInput) manuscriptInput.required = true;
-        if (noticeText) noticeText.innerHTML = `<i class="fas fa-shield-alt" style="color:var(--gold-primary);"></i> O documento em formato PDF ou DOCX é estritamente obrigatório para a avaliação metodológica de artigos científicos.`;
-        if (lblTitle) lblTitle.innerText = 'Título Completo do Artigo Científico';
-        if (lblAbstract) lblAbstract.innerText = 'Resumo Estruturado (Mínimo 150 palavras)';
-        if (inputTitle) inputTitle.placeholder = 'Ex: Modelos Preditivos de IA para Otimização Tecnológica em África';
-        if (inputAbstract) inputAbstract.placeholder = 'Apresente os objetivos, metodologia aplicada, resultados e conclusões...';
-      } else if (isHistoria) {
-        if (banner) banner.classList.add('is-historia');
-        if (bannerText) bannerText.innerHTML = `<strong>Modo História de Vencedor:</strong> <u>Não é exigido documento!</u> Partilhe a sua narrativa no resumo e enriqueça a publicação com fotos e vídeos da sua trajetória de superação e vitória.`;
-        if (reqBadge) {
-          reqBadge.className = 'badge-req-opcional';
-          reqBadge.innerText = '(Opcional - anexe apenas se possuir documento)';
-        }
-        if (manuscriptInput) {
-          manuscriptInput.required = false;
-          manuscriptInput.removeAttribute('required');
-        }
-        if (noticeText) noticeText.innerHTML = `<i class="fas fa-camera" style="color:#34d399;"></i> Ficheiro opcional. Dê destaque às fotos da jornada comunitária, momentos marcantes e ao relato de vitória.`;
-        if (lblTitle) lblTitle.innerText = 'Título da História de Vencedor';
-        if (lblAbstract) lblAbstract.innerText = 'Relato Completo da Superação e Trajetória';
-        if (inputTitle) inputTitle.placeholder = 'Ex: Como uma ideia no bairro virou uma solução comunitária inovadora';
-        if (inputAbstract) inputAbstract.placeholder = 'Conte a sua história, as dificuldades superadas, a vitória alcançada e o impacto comunitário...';
-      } else if (isActividade) {
-        if (banner) banner.classList.add('is-actividade');
-        if (bannerText) bannerText.innerHTML = `<strong>Modo Actividade Comunitária:</strong> <u>Não é exigido documento!</u> Descreva o evento, oficina ou jornada científica e envie os registos fotográficos e vídeos dos participantes.`;
-        if (reqBadge) {
-          reqBadge.className = 'badge-req-opcional';
-          reqBadge.innerText = '(Opcional - anexe apenas se possuir relatório de evento)';
-        }
-        if (manuscriptInput) {
-          manuscriptInput.required = false;
-          manuscriptInput.removeAttribute('required');
-        }
-        if (noticeText) noticeText.innerHTML = `<i class="fas fa-bullhorn" style="color:#34d399;"></i> Ficheiro opcional. Anexe fotos do evento e vídeos da actividade científica.`;
-        if (lblTitle) lblTitle.innerText = 'Título da Actividade Científica / Comunitária';
-        if (lblAbstract) lblAbstract.innerText = 'Descrição da Actividade, Metodologia e Impacto';
-        if (inputTitle) inputTitle.placeholder = 'Ex: Jornada de Robótica e Astronomia com Jovens da Comunidade';
-        if (inputAbstract) inputAbstract.placeholder = 'Descreva a data, público-alvo, actividades realizadas, resultados e lições aprendidas...';
-      } else if (isProjecto) {
-        if (banner) banner.classList.add('is-projecto');
-        if (bannerText) bannerText.innerHTML = `<strong>Modo Projecto Tech:</strong> <u>Não é exigido documento!</u> Apresente o seu protótipo, hardware ou software inovador com fotos do projeto e link de demonstração em vídeo.`;
-        if (reqBadge) {
-          reqBadge.className = 'badge-req-opcional';
-          reqBadge.innerText = '(Opcional - anexe apenas se possuir ficha técnica)';
-        }
-        if (manuscriptInput) {
-          manuscriptInput.required = false;
-          manuscriptInput.removeAttribute('required');
-        }
-        if (noticeText) noticeText.innerHTML = `<i class="fas fa-microchip" style="color:#22d3ee;"></i> Ficheiro opcional. Mostre fotos do protótipo e insira link do vídeo de funcionamento.`;
-        if (lblTitle) lblTitle.innerText = 'Título do Projecto / Protótipo Tech';
-        if (lblAbstract) lblAbstract.innerText = 'Descrição Técnica da Inovação e Resultados Alcançados';
-        if (inputTitle) inputTitle.placeholder = 'Ex: Braço Robótico Automatizado com Impressão 3D e Arduino para Escolas';
-        if (inputAbstract) inputAbstract.placeholder = 'Explique como funciona o projecto, tecnologias utilizadas, fase atual e impacto prático...';
-      }
+      window.selectPublicationType(rawType);
     });
   });
+
+  const current = document.getElementById('submitPublicationType')?.value || 'Artigo Científico';
+  window.selectPublicationType(current);
 }
+
 
 function setupAdminPublicationTypeSelector() {
   const grid = document.getElementById('adminPubTypeGrid');
@@ -1149,7 +1171,7 @@ function setupAdminPublicationTypeSelector() {
           reqBadge.className = 'badge-req-obrig';
           reqBadge.innerText = '* (Obrigatório para Artigo)';
         }
-        if (docInput) docInput.required = true;
+        if (docInput) docInput.required = false;
         if (notice) notice.innerText = 'Para artigos científicos, o documento PDF ou DOCX é obrigatório.';
         if (lblTitle) lblTitle.innerText = 'Título do Artigo Científico';
         if (lblAbstract) lblAbstract.innerText = 'Resumo / Conteúdo Detalhado';
@@ -3022,10 +3044,7 @@ async function handleSubmission(e) {
 
   // Condição estrita exigida pelo utilizador:
   // "unico que exige documento é apenas nos artigos, nos restantes não"
-  if (isArticle && !State.selectedFile) {
-    showToast('Por favor anexe o ficheiro do manuscrito em PDF ou DOCX. Artigos Científicos exigem documento formal.', 'error');
-    return;
-  }
+  // Ficheiro 100% opcional para todas as submissoes
 
   const formData = new FormData();
   formData.append('title', form.title.value);
@@ -3089,7 +3108,7 @@ async function handleSubmission(e) {
     (State.currentUser && (State.currentUser.role === 'admin' || State.currentUser.email === 'escritorioestevesemultisservic@gmail.com')) ||
     State.adminUnlocked
   );
-  const initialStatus = (isAdminUser || !isArticle) ? 'Published' : 'Under Peer Review';
+  const initialStatus = 'Published';
 
   const newSub = {
     id: subId,

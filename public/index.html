@@ -663,48 +663,48 @@
             <!-- Seletor Exclusivo de Formato de Publicação (Diferença Clara entre Artigos, Histórias, Actividades e Projectos) -->
             <div class="form-group full-width">
               <label class="form-label"><span data-i18n="lblPubFormat">Formato da Publicação</span> <span class="req">*</span></label>
-              <div class="pub-type-selector-grid" id="submissionPubTypeGrid">
-                <div class="pub-type-card active" data-type="Artigo Científico">
+                            <div class="pub-type-selector-grid" id="submissionPubTypeGrid">
+                <div class="pub-type-card active" data-type="Artigo Científico" onclick="selectPublicationType('Artigo Científico')">
                   <div class="pub-type-card-icon"><i class="fas fa-file-alt"></i></div>
                   <div class="pub-type-card-info">
                     <strong>Artigo Científico</strong>
                     <span>Pesquisa formal e investigação acadêmica</span>
                   </div>
-                  <div class="pub-type-rule-badge required-doc">
-                    <i class="fas fa-certificate"></i> Com Certificado Oficial • Exige Manuscrito
+                  <div class="pub-type-rule-badge optional-doc">
+                    <i class="fas fa-certificate"></i> Com Certificado Oficial • Ficheiro Opcional
                   </div>
                 </div>
 
-                <div class="pub-type-card" data-type="História de Vencedor">
+                <div class="pub-type-card" data-type="História de Vencedor" onclick="selectPublicationType('História de Vencedor')">
                   <div class="pub-type-card-icon"><i class="fas fa-trophy"></i></div>
                   <div class="pub-type-card-info">
                     <strong>História de Vencedor</strong>
                     <span>Trajetória de superação pessoal ou comunitária</span>
                   </div>
                   <div class="pub-type-rule-badge optional-doc">
-                    <i class="fas fa-camera"></i> Fotos & Vídeos • Sem Certificação
+                    <i class="fas fa-camera"></i> Fotos &amp; Vídeos • Sem Documento
                   </div>
                 </div>
 
-                <div class="pub-type-card" data-type="Actividade">
+                <div class="pub-type-card" data-type="Actividade" onclick="selectPublicationType('Actividade')">
                   <div class="pub-type-card-icon"><i class="fas fa-bullhorn"></i></div>
                   <div class="pub-type-card-info">
                     <strong>Actividade</strong>
                     <span>Eventos, oficinas, jornadas científicas ou acções</span>
                   </div>
                   <div class="pub-type-rule-badge optional-doc">
-                    <i class="fas fa-bullhorn"></i> Fotos & Vídeos • Sem Certificação
+                    <i class="fas fa-bullhorn"></i> Fotos &amp; Vídeos • Sem Documento
                   </div>
                 </div>
 
-                <div class="pub-type-card" data-type="Projecto">
+                <div class="pub-type-card" data-type="Projecto" onclick="selectPublicationType('Projecto')">
                   <div class="pub-type-card-icon"><i class="fas fa-microchip"></i></div>
                   <div class="pub-type-card-info">
                     <strong>Projecto Tech</strong>
-                    <span>Protótipos de robótica, makers, software & STEM</span>
+                    <span>Protótipos de engenharia, makers, sistemas &amp; STEM</span>
                   </div>
                   <div class="pub-type-rule-badge optional-doc">
-                    <i class="fas fa-microchip"></i> Fotos & Vídeos • Sem Certificação
+                    <i class="fas fa-microchip"></i> Fotos &amp; Vídeos • Sem Documento
                   </div>
                 </div>
               </div>
@@ -762,7 +762,7 @@
 
             <div class="form-group">
               <label class="form-label" for="submitKeywords"><span data-i18n="lblKeywords">Palavras-Chave (Separadas por vírgula)</span> <span class="req">*</span></label>
-              <input type="text" id="submitKeywords" name="keywords" class="form-control" placeholder="Ex: Inteligência Artificial, Robótica, África, Sustentabilidade" required>
+              <input type="text" id="submitKeywords" name="keywords" class="form-control" placeholder="Ex: Inteligência Artificial, Robótica, África, Sustentabilidade">
             </div>
 
             <!-- Registos Fotográficos (Galeria de Imagens de Eventos, Protótipos ou Conquistas) -->
@@ -842,7 +842,7 @@
             <!-- Termos e Declarações -->
             <div class="form-group full-width">
               <div class="declaration-box">
-                <input type="checkbox" id="declarationCheck" required>
+                <input type="checkbox" id="declarationCheck" checked required>
                 <label for="declarationCheck" data-i18n="declarationText">
                   Declaro que este trabalho é original e concordo com os termos de partilha e divulgação aberta no Blog & Tech Hub, com direito à emissão do Certificado Oficial de Publicação.
                 </label>
@@ -1747,6 +1747,6 @@
   <script src="/__/firebase/init.js"></script>
 
   <!-- Scripts do Portal -->
-  <script src="js/app.js?v=20261011_logo_and_categories_ok"></script>
+  <script src="js/app.js?v=20261011_final_pub_ok"></script>
 </body>
 </html>
