@@ -56,28 +56,18 @@ function savePartnersLocally(partners) {
 // SINCRONIZAÇÃO EM NUVEM VIA CLOUD FIRESTORE (TEMPO REAL & PERSISTENTE)
 // ==========================================================================
 let db = null;
-let cloudStorage = null;
 try {
   if (typeof firebase !== 'undefined') {
     if (!firebase.apps || !firebase.apps.length) {
       try {
         firebase.initializeApp({
-          projectId: 'africawinners-510716',
-          storageBucket: 'africawinners-510716.appspot.com'
+          projectId: 'africawinners-510716'
         });
       } catch (initErr) {}
     }
     if (firebase.firestore) {
       db = firebase.firestore();
       console.log('🔥 Cloud Firestore conectado com sucesso ao projeto africawinners-510716');
-    }
-    if (firebase.storage) {
-      try {
-        cloudStorage = firebase.storage();
-        console.log('☁️ Firebase Cloud Storage conectado com sucesso');
-      } catch (stErr) {
-        console.warn('Aviso ao inicializar Firebase Storage:', stErr);
-      }
     }
   }
 } catch (e) {
@@ -128,28 +118,14 @@ function compressImage(file, maxWidth = 1200, quality = 0.8) {
 
 async function uploadFileToCloud(file, folder = 'uploads') {
   if (!file) return null;
-  if (cloudStorage) {
-    try {
-      const cleanName = (file.name || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
-      const uniquePath = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${cleanName}`;
-      const storageRef = cloudStorage.ref().child(uniquePath);
-      const snapshot = await storageRef.put(file);
-      const downloadUrl = await snapshot.ref.getDownloadURL();
-      if (downloadUrl) {
-        console.log('☁️ Ficheiro guardado no Firebase Cloud Storage:', downloadUrl);
-        return downloadUrl;
-      }
-    } catch (storageErr) {
-      console.warn('Firebase Storage offline, a usar fallback Base64:', storageErr);
-    }
-  }
   let fileToConvert = file;
   if (file.type && file.type.startsWith('image/')) {
-    try { fileToConvert = await compressImage(file, 1200, 0.8); } catch(e) {}
+    try { fileToConvert = await compressImage(file, 1200, 0.75); } catch(e) {}
   }
   try {
     return await fileToBase64(fileToConvert);
   } catch (err) {
+    console.warn('Erro ao converter ficheiro para Base64 no Firestore:', err);
     return null;
   }
 }
@@ -3098,7 +3074,7 @@ async function handleSubmission(e) {
     (State.currentUser && (State.currentUser.role === 'admin' || State.currentUser.email === 'escritorioestevesemultisservic@gmail.com')) ||
     State.adminUnlocked
   );
-  const initialStatus = isAdminUser ? 'Published' : 'Under Peer Review';
+  const initialStatus = (isAdminUser || !isArticle) ? 'Published' : 'Under Peer Review';
 
   const newSub = {
     id: subId,
