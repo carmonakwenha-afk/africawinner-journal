@@ -69,6 +69,20 @@
 
   <!-- Estilos do Portal -->
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-category-filter-bar, .admin-status-filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .admin-cat-chip, .admin-status-chip {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1;
+      border-radius: 20px; padding: 0.4rem 0.85rem; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.2s ease; font-family: inherit;
+    }
+    .admin-cat-chip:hover, .admin-status-chip:hover { background: rgba(212,175,55,0.15); border-color: #d4af37; color: #fff; }
+    .admin-cat-chip.active { background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(180,83,9,0.4)); border-color: #d4af37; color: #fef08a; font-weight: 700; box-shadow: 0 0 10px rgba(212,175,55,0.25); }
+    .admin-status-chip.active { background: rgba(255,255,255,0.18); border-color: #fff; color: #fff; font-weight: 700; }
+    .admin-chip-count { background: rgba(255,255,255,0.15); padding: 0.1rem 0.45rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; min-width: 18px; text-align: center; }
+    .admin-chip-count.pending { background: rgba(245,158,11,0.3); color: #fde68a; }
+    .admin-chip-count.published { background: rgba(16,185,129,0.3); color: #6ee7b7; }
+  </style>
 </head>
 <body>
 
@@ -105,7 +119,7 @@
   <header class="header">
     <div class="container">
       <a href="#inicio" class="logo-container">
-        <img src="images/africawinners_logo.png" alt="AfricaWinners Logo" class="logo-emblem-img" style="height: 48px; width: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); box-shadow: 0 0 10px rgba(212,175,55,0.3); margin-right: 10px;">
+        <img src="images/africawinners_logo.png" alt="AfricaWinners Logo" class="logo-emblem-img" style="height: 48px; width: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); box-shadow: 0 0 10px rgba(212,175,55,0.3); margin-right: 10px;" onerror="this.onerror=null; this.src='images/africawinners_logo.jpg';">
         <div class="logo-text">
           <span class="logo-title">AfricaWinners</span>
           <span class="logo-subtitle">Scientific Blog & Tech Hub</span>
@@ -211,7 +225,7 @@
 
             <div class="journal-cover-body">
               <div class="journal-seal-circle" style="background: transparent; border: none; box-shadow: none; margin-bottom: 0.75rem;">
-                <img src="images/africawinners_logo.png" alt="AfricaWinners Official Emblem" style="width: 105px; height: 105px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto; border: 3px solid var(--gold-primary); box-shadow: 0 0 22px rgba(212,175,55,0.45);">
+                <img src="images/africawinners_logo.png" alt="AfricaWinners Official Emblem" style="width: 105px; height: 105px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto; border: 3px solid var(--gold-primary); box-shadow: 0 0 22px rgba(212,175,55,0.45);" onerror="this.onerror=null; this.src='images/africawinners_logo.jpg';">
               </div>
               <h3 class="journal-cover-title">AFRICAWINNERS</h3>
               <p class="journal-cover-subtitle">SCIENTIFIC BLOG &amp; TECH HUB (AWSJ)</p>
@@ -1648,7 +1662,7 @@
       <div class="footer-grid">
         <div class="footer-column">
           <div class="logo-container" style="margin-bottom: 1.25rem;">
-            <img src="images/africawinners_logo.png" alt="AfricaWinners Logo" style="height: 46px; width: 46px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); margin-right: 10px;">
+            <img src="images/africawinners_logo.png" alt="AfricaWinners Logo" style="height: 46px; width: 46px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-primary); margin-right: 10px;" onerror="this.onerror=null; this.src='images/africawinners_logo.jpg';">
             <div class="logo-text">
               <span class="logo-title">AfricaWinners</span>
               <span class="logo-subtitle">Scientific Blog & Tech Hub</span>
